@@ -1,0 +1,15 @@
+= Sequoia
+Dave Menninger
+
+== Pages
+
+* index.html
+* bib.html
+* barcodes.html
+* help.html
+
+== "API methods"
+
+* /bibitems - information about a single bib, by bibnumber
+* /itemsinfo - information about a set of items, by item barcode
+* /labels - produces a PDF file, returns info about file
