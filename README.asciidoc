@@ -1,6 +1,35 @@
 = Sequoia
 Dave Menninger
 
+== Overview
+
+Sequoia is an on-demand label creation app for Sierra ILS from Innovative Interfaces.  It provides a web interface through which a user can request a label or group of labels and it delivers a PDF.
+
+== History
+
+This code started out working with a different ILS, running on a different platform, and wrapped in various different wrappers over time.  The meat of the code in MakeLabelPDF.pm that does most of the heavy lifting is at least a decade old and has been contributed to by 2-3 authors.
+
+== How to run this app
+
+This app is designed to be run in Docker.  It relies on some environment variables that can either be set in the Dockerfile or using the run command.
+
+* `git clone <this app>`
+* `cd sequoia`
+* `sudo docker.io build -t sequoia1 .`
+* `sudo docker.io run -e "DB_HOST=db.example.com" -e "DB_PORT=0" -e "DB_USER=sqlusername" -e "DB_PASS=secret" sequoia1`
+
+or 
+
+* `git clone <this app>`
+* `cd sequoia`
+* add these rows to `Dockerfile` before the `CMD` command.
+** `ENV DB_HOST db.example.com`
+** `ENV DB_PORT 0`
+** `ENV DB_USER sqlusername`
+** `ENV DB_PASS secret`
+* `sudo docker.io build -t sequoia1 .`
+* `sudo docker.io run sequoia1`
+
 == Pages
 
 * index.html
@@ -13,3 +42,12 @@ Dave Menninger
 * /bibitems - information about a single bib, by bibnumber
 * /itemsinfo - information about a set of items, by item barcode
 * /labels - produces a PDF file, returns info about file
+
+== Credits
+
+* Public Library of Hamilton County
+** Dave Menninger
+** Rob Ireton
+* DejaVu fonts
+* octohost/mojolicious
+* docker.io
