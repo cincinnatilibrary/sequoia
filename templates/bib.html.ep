@@ -1,35 +1,65 @@
-% use Time::Piece;
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="<%= $author %>">
-    <title>Make a file</title>
-    
+    <title>Sequoia - Bib</title>
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    
-  </head>
+    <link href="./favicon.ico" rel="shortcut icon">
+    <script src="./jquery-1.10.1.min.js"></script>
+    <script src="./sequoia.js"></script>
 
-% my $now = localtime;
+  </head>
 
   <body>
 
     <div class="container">
-      <div class="header">
-        <h3 class="text-muted">dave menninger</h3>
+      <h1>On-Demand Labels</h1>
+
+
+      <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-inner">
+          <div class="container" >
+            <ul class="nav navbar-nav">
+              <li><a href="./">Home</a></li>
+              <li class="active"><a href="./bib.html">by bib number</a></li>
+              <li><a href="./barcodes.html">by barcode</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
 
-      <div class="jumbotron">
-      Time: <%= $now->hms %><br/>
-      File: <a href="./<%= $file_name %>"><%= $file_name %></a><br/>
-      DB: <%= $db_host %>
+      <div id="bibTitle" >
+
+      <form id="bibSearch" action="javascript:find_barcodes();" >
+        <fieldset>
+          <legend>Enter one bib record number: ( e.g. b10411914 ):</legend>
+          <input id="bibNumInput" type="text" />
+          ( icode1: <input id="icode1NumInput" type="text" value="all" size="3" /> )
+          <input type="submit" value="Find Items" />
+        </fieldset>
+      </form>
+
+      <p></p>
+      <div id="bibItems" >
+        <ul id="myBarcodeList">
+        </ul>
       </div>
-    </div> 
-   
+
+      <form id="makeLabels" action="javascript:make_labels();" style="display: none">
+        <input id="makeButton" type="submit" value="Make PDF" />
+      </form>
+
+      </div>
+
+      <div id="myPdf">
+      <ul id="myPdfList">
+      </ul>
+      </div>
     
+
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+
+    </div> 
   </body>
 </html>
