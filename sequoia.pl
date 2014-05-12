@@ -22,10 +22,8 @@ my $db_host = $ENV{'DB_HOST'};;
 my $db_port = $ENV{'DB_PORT'};
 my $db_user = $ENV{'DB_USER'};
 my $db_pass = $ENV{'DB_PASS'};
-my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0});
+my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0,'pg_enable_utf8'=>1});
 
-#we'll see this whenever morbo restarts automatically for us
-app->log->debug( "db connection made..." );
 
 #routes for the template pages
 #-----------------------------

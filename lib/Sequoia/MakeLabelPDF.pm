@@ -686,8 +686,11 @@ sub create_label_PDFs {
                     #UBUNTU trusty
                     #'normal' 		=> $pdf->ttfont( '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansCondensed.ttf' , '-encoding' => 'utf8' ),
                     #'bold' 	=> $pdf->ttfont( '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),  
-                    'normal' => $pdf->corefont( 'Helvetica',      '-encoding' => 'utf8' ),
-                    'bold'   => $pdf->corefont( 'Helvetica-Bold', '-encoding' => 'utf8' ),
+                    #'normal' => $pdf->corefont( 'Helvetica',      '-encoding' => 'utf8' ),
+                    #'bold'   => $pdf->corefont( 'Helvetica-Bold', '-encoding' => 'utf8' ),
+                    #LOCAL
+                    'normal' => $pdf->ttfont( './fonts/dejavu-lgc-fonts-ttf-2.34/ttf/DejaVuLGCSansCondensed.ttf' , '-encoding' => 'utf8' ),
+                    'bold' => $pdf->ttfont( './fonts/dejavu-lgc-fonts-ttf-2.34/ttf/DejaVuLGCSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),  
                 };
 
                 my $label_count = 0;
