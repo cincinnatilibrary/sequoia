@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sequoia</title>
-    <link href="./favicon.ico" rel="shortcut icon">
-    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <script src="./bower_components/jquery/dist/jquery.min.js"></script>
-    <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    
-  </head>
-  <body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sequoia</title>
+  <link href="./favicon.ico" rel="shortcut icon">
+  <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>  
+</head>
+<body>
+  <div class="container">
 
-    <div class="container">
-      <div class="header">
-        <h1>Sequoia</h1>
-      </div>
+    <h1>Sequoia</h1>
 
     <div class="navbar navbar-default" role="navigation">
       <div class="navbar-inner">
@@ -30,15 +27,15 @@
       </div>
     </div>
 
-      <div class="jumbotron">
-        <p>DB Host is: <%= $db_host %></p>
-      </div>
+    <div class="jumbotron">
+      <p>DB Host is: <%= $db_host %></p>
+    </div>
 
-      <footer class="navbar-default navbar-fixed-bottom">
-            <div class="container">
-              <p class="text-muted">DB Host is: <%= $db_host %></p>
-            </div>
-      </footer>
+    <footer class="navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <p class="text-muted">DB Host is: <%= $db_host %></p>
+      </div>
+    </footer>
 
     </div>
   </body>

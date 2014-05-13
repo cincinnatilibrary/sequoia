@@ -3,9 +3,6 @@ FROM octohost/mojolicious
 
 #Pre-req's
 RUN apt-get update
-#RUN apt-get install -y cpanminus
-#RUN cpanm DBI 
-#RUN cpanm DBD::Pg
 RUN apt-get install -y libdbd-pg-perl libpdf-api2-perl
 
 #This is necessary, but I'm not 100% why

@@ -16,11 +16,8 @@ our @EXPORT = qw(
 my $granularity = 30; #in minutes; smaller than 60, normal value is 30.
 
 #ITYP:
-my %is_cassette_type  = map { $_ => 1 } qw( CASS-BKREF CASS-BOOK CASS-MUREF CASS-MUSIC FCASS-BOOK FCASS-MUSI JCASS-BOOK JCAS-MUSIC FJCAS-MUS FJCASS-BK );
-my %is_reference_type = map { $_ => 1 } qw( ATLAS-REF BRAILLEREF CASS-BKREF CASS-MUREF CD-BK-REF CD-MU-REF CD-ROM-REF GRAPH-REF JATLAS-REF JBOOK-REF TBOOK-REF TMAG-REF JLRGPR-REF JMAG-REF JPOPUP-REF JSCORE-REF LPREC-REF LRGPR-REF MAG-REF MAP PIC-REF POPUP-REF POSTER-REF PRINT-REF RAREBOOK REALIA-REF REF-BOOK SCORE-REF VIDEO-REF );
-#sierra - doesn't have FCASS-BOOK, FCASS-MUSI, FJCAS-MUS, FJCASS-BK?
-%is_cassette_type  = map { $_ => 1 } qw( 62 60 67 65 61 66 );
-%is_reference_type = map { $_ => 1 } qw( 10 11 12 16 18 26 27 33 34 35 62 67 73 79 83 94 103 135 139 149 152 154 155 161 162 );
+my %is_cassette_type  = map { $_ => 1 } qw( 62 60 67 65 61 66 );
+my %is_reference_type = map { $_ => 1 } qw( 10 11 12 16 18 26 27 33 34 35 62 67 73 79 83 94 103 135 139 149 152 154 155 161 162 );
 
 #ICT1:
 my %is_disc_category  = map { $_ => 1 } qw( CD-BOOK CD-MUSIC CD-ROM VIDEO-DVD VIDEO-VHS PLAYAWAY ); #ICT1; VHS added on 2009/07/16 at request of Amanda Pittman
