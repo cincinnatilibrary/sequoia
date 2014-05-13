@@ -39,14 +39,17 @@ get '/index.html' => sub {
 };
 get '/bib.html' => sub {
 	my $self = shift;
+	$self->stash( db_host => $db_host );
 	$self->render('bib');
 };
 get '/barcodes.html' => sub {
 	my $self = shift;
+	$self->stash( db_host => $db_host );
 	$self->render('barcodes');
 };
 get '/help.html' => sub {
 	my $self = shift;
+	$self->stash( db_host => $db_host );
 	$self->render('help');
 };
 

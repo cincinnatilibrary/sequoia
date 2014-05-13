@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sequoia - Bib</title>
-    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link href="./favicon.ico" rel="shortcut icon">
+    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
     <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="./sequoia.js"></script>
 
   </head>
@@ -24,6 +25,7 @@
               <li><a href="./">Home</a></li>
               <li class="active"><a href="./bib.html">by bib number</a></li>
               <li><a href="./barcodes.html">by barcode</a></li>
+              <li><a href="./help.html">help</a></li>
             </ul>
           </div>
         </div>
@@ -56,9 +58,12 @@
       <ul id="myPdfList">
       </ul>
       </div>
-    
 
-    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+      <footer class="navbar-default navbar-fixed-bottom">
+            <div class="container">
+              <p class="text-muted">DB Host is: <%= $db_host %></p>
+            </div>
+      </footer>
 
     </div> 
   </body>

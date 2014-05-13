@@ -52,6 +52,7 @@ I also need to use `--dns="<local-dns-server>"` in my `run` command.
 * Public Library of Hamilton County
 ** Dave Menninger
 ** Rob Ireton
-* DejaVu fonts
-* octohost/mojolicious
-* docker.io
+* PDF::API2
+* DejaVu LGC fonts
+* docker.io, octohost/mojolicious
+* jquery, bootstrap, bower
