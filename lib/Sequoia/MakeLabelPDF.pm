@@ -13,6 +13,7 @@ our @EXPORT = qw(
     produce_and_distribute_labels
 );
 
+#TODO: get rid of this
 my $granularity = 30; #in minutes; smaller than 60, normal value is 30.
 
 #ITYP:
@@ -22,7 +23,7 @@ my %is_reference_type = map { $_ => 1 } qw( 10 11 12 16 18 26 27 33 34 35 62 67 
 #ICT1:
 my %is_disc_category  = map { $_ => 1 } qw( CD-BOOK CD-MUSIC CD-ROM VIDEO-DVD VIDEO-VHS PLAYAWAY ); #ICT1; VHS added on 2009/07/16 at request of Amanda Pittman
 my %spine_gets_copy   = map { $_ => 1 } qw( CD-BOOK CD-MUSIC CASS-BOOK CASS-MUSIC PLAYAWAY ); #ICT1
-#sierra ict1=bcode2
+#TODO: sierra ict1=bcode2
 #%is_disc_category = map { $_ => 1 } qw( i j m g h p );
 #%spine_gets_copy  = map { $_ => 1 } qw( i j 5 7 p );
 
@@ -59,7 +60,7 @@ my %ict1_for_bcode2 = (
 	'-' => 'UNKNOWN'
 	);
 	
-#translate a Sierra two-letter prefix into a three-letter code
+#translate a Sierra two-letter prefix into a three-letter agency code
 my %agency_for_two_letter_prefix = (
 		'1c' => 'CLC',
 		'1l' => 'CLC', 
@@ -144,6 +145,62 @@ my %agency_for_two_letter_prefix = (
 		'5t' => 'TEC'
 		);
 
+my %ityp_is_floating  = map {$_=>1} qw( 1 3 5 21 23 158 160 );  #SIERRA: ityp code numbers.
+my %ityp_can_float    = map {$_=>1} qw( BOOK 0 2 4 20 22 60 61 70 71 72 77 78 90 91 92 101 157 159 );  #SIERRA: itype code numbers.
+my %libr_is_branch    = map {$_=>1} qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy );  #take the branch prefix from location_code
+
+sub locn_floats{
+	my $locn = shift;
+	my $location_code_4		= ( length $locn > 3 ) ? substr( $locn, 3, 1 ) : "";
+	my $location_code_5		= ( length $locn > 4 ) ? substr( $locn, 4, 1 ) : "";
+	my $shelf				= $location_code_4 . $location_code_5;
+	
+	#Sierra item location "suffixes"
+	my %is_floating_shelf	= map { $_ => 1 } qw( oo aa ab af al an ao ar au bd bg bi c cb cc ce cf cg ch ci ch ck cl cm cn co cp cq cr cs cv cw cx cy cz d da dc df dm dr ds dt du eb ec er es f fc ff fh fl fm fp fr fs fw gn ho in kl l lf ln mc nf nr od  pb pl ps pu sb se sf sl ss st tv v vf vm );
+	
+	return 1 if $is_floating_shelf{$shelf};
+
+	return 0;
+}
+	
+#says_floating is used to decide whether to put the word "Floating" on item labels
+sub says_floating {
+    my %param = @_;
+    my $ityp = $param{'ityp'} || '';  #these are sierra ityp numbers
+    my $ict1 = $param{'ict1'} || '';  #these get translated to their old symphony names
+    my $libr = $param{'libr'} || '';  #these are sierra agency numbers
+    my $locn = $param{'locn'} || '';  #these are sierra shelf locations
+
+	my $location_code_1_2 	= substr( $locn, 0, 2 );
+	$libr = $location_code_1_2;
+
+    return 0 if $ict1 eq 'VIDEO-VHS';
+
+	#main dvd's float    
+    #SIERRA: MAIN = 1; "DVD/Videocassette" = "101"
+    return 1 if $libr eq '1' && $ityp eq '101';  
+    
+    #pop library
+	if ($location_code_1_2 eq '1p' )
+	{
+		#new dvd's do not float
+		return 0 if $ityp eq '100';
+		#old dvd's do float
+		return 1 if $ityp eq '101';
+		#everything else in pop does not float
+		return 0;
+	}
+
+    if ($libr_is_branch{$libr}) {
+		#certain itypes float at branches
+        return 1 if ($ityp_is_floating{$ityp});
+        #certain itypes can float if they are certain shelf locations
+        return 1 if $ityp_can_float{$ityp} && locn_floats($locn);
+    }
+
+	#eveything else doesn't float
+    return 0;
+}
 
 sub get_info_for_requested_items {
 	#---------------------------------------------------
@@ -151,12 +208,10 @@ sub get_info_for_requested_items {
 	# Get bib and item data from SQL for requested items
 	#
 	#---------------------------------------------------
-	# Ugh, forked form mainline code on 6/19/2013 -DJM
 	
     use List::Util qw( min );
     
-    my ( $dbh, $label_request_ref, $item_info_ref, $arg_ref) = @_;
-    my $tempfile = './items.txt';
+    my ( $dbh, $label_request_ref, $item_info_ref ) = @_;
 
 	#puts the itemids into an array.
 	my @itemids = ();
@@ -167,9 +222,6 @@ sub get_info_for_requested_items {
             }
         }
     }
-
-   	my $num_items = @itemids;
-	#print "total number of requested items: ".$num_items."\n";
 
 	my $sql_query = "SELECT ";
 
@@ -271,8 +323,6 @@ sub get_info_for_requested_items {
 	
 	$sql_query .= ";";
 	
-	#print "\n".$sql_query."\n\n";
-
 	#start timing the SQL query
 	my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
 	my $hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
@@ -293,7 +343,7 @@ sub get_info_for_requested_items {
 	{
 		$items_info_found +=1;
 		
-		#libr - used to decide floating by the says_floating function in Floating.pm
+		#libr - used to decide floating by the says_floating function
 		my $libr = $item_info->{'agency_code_num'};
 
 		#ict1 <- bib_view.bcode2 aka format aka mattype
@@ -387,31 +437,26 @@ sub get_info_for_requested_items {
 		$title =~ s/\|p/ /i;
         $title =~ s{ [ ]+ \[ [^\]]+ \] [ ]* }{ }xms; #remove subfield h, which should be the first thing in brackets
 
-        
 		#browse
 		my $browse = $item_info->{'title'};
         $browse =~ s/ \A 0+ ([1-9] [0-9]*) /$1/xms;  #initial zeros at start
         $browse =~ s/ ([^1-9]) (?<![.0]) 0+ ([1-9] [0-9]*) /$1$2/xmsg; # initial zeros within
 
-        
-	#author
-	my $author = defined $item_info->{'author'} ? $item_info->{'author'} : "";
-	#first remove linkage subfield
-	if ( substr( $author, 0, 2 ) eq '|6' )
-	{
-		my $begin = index ( $author, '|', 2 );  #find the next subfield after the first one, which was the |6
-		$author = substr( $author, $begin, ( length($author) - $begin ) );  #cut off the whole first subfield and take the rest
-	}
+		#author
+		my $author = defined $item_info->{'author'} ? $item_info->{'author'} : "";
+		#first remove linkage subfield
+		if ( substr( $author, 0, 2 ) eq '|6' )
+		{
+			my $begin = index ( $author, '|', 2 );  #find the next subfield after the first one, which was the |6
+			$author = substr( $author, $begin, ( length($author) - $begin ) );  #cut off the whole first subfield and take the rest
+		}
         $author =~ s/\|a//i;	
         $author = substr($author, 0, index($author, ',')) if index($author, ',') > -1;
-	$author =~ s/\.$//i;
-        
-        
+		$author =~ s/\.$//i;
+
 		#call number
 		my $callnum = ( defined $item_info->{'callnum'} ) ? $item_info->{'callnum'} : '';
-
 		$callnum =~ s/,//i;	
-
 
 		#classification
 		my $callclass = "";
@@ -441,7 +486,6 @@ sub get_info_for_requested_items {
 
 		$callnum =~ s/\|a//i;	
 		$callnum =~ s/\|b/ /i;
-		#$callnum =~ s/,//i;	
 		if 	( 	( $ict2 eq 'JUVENILE' ) and 
 				( $callnum !~ /Easy/i or $callnum =~ /^PL-Spoken/i ) and
 				( $ityp ne '100' and $ityp ne '101' )
@@ -455,6 +499,7 @@ sub get_info_for_requested_items {
         $callnum =~ s/\b(v|no|pt)[.] +(\d+)/$1.$2/i;
 
 		#start counting item pieces
+		#--------------------------
         my $book_pieces = 0;
         my $disc_pieces = 0;
         
@@ -511,13 +556,11 @@ sub get_info_for_requested_items {
 			}
         }
         #end counting item pieces
+        #------------------------
 
-        
         #barcode is the key in the hash, so it must be defined
         my $barcode = ( defined $item_info->{'barcode'} ) ? uc $item_info->{'barcode'} : "";
-        #print $barcode . ", ";
 
-		
 		#places everything we want to know about this item into this item_info_ref hash
 		#------------------------------------------------------------------------------
 		$item_info_ref->{$barcode}{'barcode'}     = $barcode;
@@ -537,7 +580,6 @@ sub get_info_for_requested_items {
 		$item_info_ref->{$barcode}{'book_pieces'} = min ($book_pieces, $marc955_pieces);
 		$item_info_ref->{$barcode}{'disc_pieces'} = min ($disc_pieces, $marc955_pieces);
     }
-   	#$dbh->disconnect();
 
     return;
 }
@@ -649,9 +691,10 @@ sub create_label_PDFs {
 				#local name should be connected to what LabelSet thinks it is.  Hmm...
 				# there needs to be one file for book and one for disc?
 				# also they need to not clobber each other with multiple people working at the same time
+				#TODO: this is nasty
 				my @foo = sort @{ $requests_ref->{$user}{$date}{$period} };
 				my $bar = scalar @foo ;
-				my $baz = $foo[0];
+				my $baz = $foo[0]; #file name will be based on first barcode in the file
 				my $qux = $baz->{'itemid'};
 				
 				$local_filename = $tag.".".$qux.".pdf";
@@ -758,7 +801,7 @@ sub add_disc_label {
 	#------------------------------------
 	
     use PDF::API2;
-    use Sequoia::Floating;
+    #use Sequoia::Floating;
     use constant in => 1 / 72; # 1 inch = 72 points
     use constant pt => 1;
     my ($pdf, $fonts_ref, $item_info_ref, $req_ref) = @_;
@@ -784,7 +827,7 @@ sub add_disc_label {
     $gfx->textlabel( 172/pt,  92/pt, $font{'helvetica'},  7/pt, 'of Cincinnati and',  '-align' => 'center' );  #+33pt
     $gfx->textlabel( 172/pt,  84/pt, $font{'helvetica'},  7/pt,  'Hamilton County',   '-align' => 'center' );  #+25pt
     $gfx->textlabel( 172/pt,  59/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );  #base
-    if ( Sequoia::Floating::says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
+    if ( says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
         $gfx->textlabel( 172/pt, 40/pt, $font{'helveticabold'}, 14/pt, 'Floating', '-align' => 'center' );  #loan period
     }
 
@@ -793,7 +836,7 @@ sub add_disc_label {
     $gfx->textlabel( 251/pt,  92/pt, $font{'helvetica'},  7/pt, 'of Cincinnati and',  '-align' => 'center' );  #+33pt
     $gfx->textlabel( 251/pt,  84/pt, $font{'helvetica'},  7/pt,  'Hamilton County',   '-align' => 'center' );  #+25pt
     $gfx->textlabel( 251/pt,  59/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );  #base
-    if ( Sequoia::Floating::says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
+    if ( says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
         $gfx->textlabel( 251/pt, 40/pt, $font{'helveticabold'}, 14/pt, 'Floating', '-align' => 'center' );  #loan period
     }
 
@@ -916,7 +959,7 @@ sub add_book_label {
 	#------------------------------------
 	
     use PDF::API2;
-    use Sequoia::Floating;
+    #use Sequoia::Floating;
     use constant in => 1 / 72; # 1 inch = 72 points
     use constant pt => 1;
     my ($pdf, $fonts_ref, $item_info_ref, $req_ref) = @_;
@@ -957,7 +1000,7 @@ sub add_book_label {
     $gfx->textlabel( 258/pt, 172/pt, $font{'helvetica'},  7/pt, 'of Cincinnati and', '-align' => 'center' );
     $gfx->textlabel( 258/pt, 164/pt, $font{'helvetica'},  7/pt,  'Hamilton County', '-align' => 'center' );
     $gfx->textlabel( 258/pt, 139/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );
-    if ( Sequoia::Floating::says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
+    if ( says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
         $gfx->textlabel( 258/pt, 120/pt, $font{'helveticabold'}, 14/pt, 'Floating', '-align' => 'center' );
     }
 

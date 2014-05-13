@@ -20,11 +20,8 @@ sub label_set {
 	#various timestamps used for various purposes
 	my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
 	my $yyyymmdd = sprintf  "%.4d%.2d%.2d", $year+1900, $mon+1, $mday;
-	my $yyyymmdd_hyphens = sprintf  "%.4d-%.2d-%.2d", $year+1900, $mon+1, $mday;
 	my $hhmmss = sprintf "%.2d%.2d%.2d", $hour, $min, $sec;
 	my $hhmmss_colons = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
-	
-	#TODO: error checking / input validation
 	
 	#=============
 	#PRODUCE A PDF
@@ -45,6 +42,7 @@ sub label_set {
 	
 	foreach my $barcode (@barcodes)
 	{
+		#TODO: error checking / input validation
 		$label_requests{$yyyymmdd}{'OnDemand'}{$barcode} = $hhmmss;
 	}
 	
@@ -52,11 +50,7 @@ sub label_set {
 	get_info_for_requested_items(
 		$dbh, 
 		\%label_requests, 
-		\%item_info_for, 
-		{
-			'proglogs'     => [ 'log1', 'log2', 'log3' ], # where do these log files go?
-			'tempfiles'    => [ 'log4' ],
-		}
+		\%item_info_for
 	);
 
 	#directory perl can access and create subdirs, files, etc

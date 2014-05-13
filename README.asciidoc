@@ -11,9 +11,9 @@ This code started out working with a different ILS, running on a different platf
 
 The label sizes, types, fonts, layout, etc, are all hard-coded in for our local purposes.  Re-writing those parts of the code to be more configurable would be nice.
 
-== How to run this app
+== How to run this app in Docker
 
-This app is designed to be run in Docker.  It relies on some environment variables that can either be set in the Dockerfile or using the run command.
+This app is designed to be run in Docker, but it doesn't have to be.  It relies on some environment variables that can either be set in the Dockerfile or using the run command.
 
 * `git clone <this app>`
 * `cd sequoia`
@@ -46,6 +46,11 @@ I also need to use `--dns="<local-dns-server>"` in my `run` command.
 * /bibitems - information about a single bib, by bibnumber
 * /itemsinfo - information about a set of items, by item barcode
 * /labels - produces a PDF file, returns info about file
+
+== TODO
+
+* fold Floating.pm into MakeLabelPDF.pm
+* page for deleting old .pdf files
 
 == Credits
 
