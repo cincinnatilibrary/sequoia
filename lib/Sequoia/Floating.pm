@@ -1,18 +1,13 @@
 package Sequoia::Floating;
 
-use 5.008007;
 use warnings;
 use strict;
-use Carp;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(
-    is_floating
-    should_float
-    says_floating
-);
 our @EXPORT = qw( says_floating);
+
+#TODO: consider moving this junk into MakeLabelPDF.pm
 
 #PLCH specific maps
 my %ityp_is_floating  = map {$_=>1} qw( 1 3 5 21 23 158 160 );  #SIERRA: ityp code numbers.
@@ -39,7 +34,7 @@ sub says_floating {
     my $ityp = $param{'ityp'} || '';  #these are sierra ityp numbers
     my $ict1 = $param{'ict1'} || '';  #these get translated to their old symphony names
     my $libr = $param{'libr'} || '';  #these are sierra agency numbers
-    my $locn = $param{'locn'} || '';  #these are sierra shelf locations??
+    my $locn = $param{'locn'} || '';  #these are sierra shelf locations
 
 	my $location_code_1_2 	= substr( $locn, 0, 2 );
 	$libr = $location_code_1_2;

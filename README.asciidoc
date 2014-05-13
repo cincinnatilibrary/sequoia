@@ -9,6 +9,8 @@ Sequoia is an on-demand label creation app for Sierra ILS from Innovative Interf
 
 This code started out working with a different ILS, running on a different platform, and wrapped in various different wrappers over time.  The meat of the code in MakeLabelPDF.pm that does most of the heavy lifting is at least a decade old and has been contributed to by 2-3 authors.
 
+The label sizes, types, fonts, layout, etc, are all hard-coded in for our local purposes.  Re-writing those parts of the code to be more configurable would be nice.
+
 == How to run this app
 
 This app is designed to be run in Docker.  It relies on some environment variables that can either be set in the Dockerfile or using the run command.

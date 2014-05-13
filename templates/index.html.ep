@@ -32,6 +32,12 @@
         <p>DB Host is: <%= $db_host %></p>
       </div>
 
+      <footer class="navbar-default navbar-fixed-bottom">
+            <div class="container">
+              <p class="text-muted">DB Host is: <%= $db_host %></p>
+            </div>
+      </footer>
+
     </div>
     <script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
   </body>
