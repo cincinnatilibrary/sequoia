@@ -32,6 +32,8 @@ or
 * `sudo docker.io build -t sequoia1 .`
 * `sudo docker.io run sequoia1`
 
+I also need to use `--dns="<local-dns-server>"` in my `run` command.
+
 == Pages
 
 * index.html
