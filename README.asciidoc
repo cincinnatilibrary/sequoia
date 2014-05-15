@@ -49,8 +49,9 @@ I also need to use `--dns="<local-dns-server>"` in my `run` command.
 
 == TODO
 
-* fold Floating.pm into MakeLabelPDF.pm
+* layout
 * page for deleting old .pdf files
+* performance testing - hypnotoad or starman
 
 == Credits
 

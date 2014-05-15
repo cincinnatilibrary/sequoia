@@ -13,7 +13,6 @@ BEGIN{
 	use Sequoia::LabelSet;
 }
 
-
 #we'll see this whenever morbo restarts automatically for us
 app->log->debug( "is this thing on...?" );
 

@@ -5,9 +5,6 @@ use warnings;
  
 use PDF::API2;
 
-use constant in => 1 / 72;
-use constant pt => 1;
-
 BEGIN
 {
 	use Sequoia::MakeLabelPDF qw( get_info_for_requested_items produce_and_distribute_labels );

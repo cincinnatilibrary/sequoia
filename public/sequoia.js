@@ -1,5 +1,5 @@
 // Used by bib.html, barcodes.html, and replace.html to interact with mod_perl json services on ilsaux.plch.net
-// Dave Menninger - 2013
+// Dave Menninger - 2014
 
 //------------------------------------------------------------
 // used by bib.html to look up barcodes for a given bib number
@@ -53,7 +53,7 @@ function find_barcodes()
 			{
 				//we've seen it once before
 				times_barcode_seen[bc] += 1;
-				//console.log("dupe: " + bc);
+				console.log("dupe: " + bc);
 				array_of_dupes.push( bc );
 				//my_bc_list += '<li>' + bc + '</li>';
 				my_bc_list += '<li class="itemnotfound"> &#10005; ';
@@ -67,7 +67,7 @@ function find_barcodes()
 				my_bc_list += '<li>' + bc + '</li>';
 			}
 		});
-
+		
 		var dupe_warning_message = "This title contains duplicate barcodes!";
 
 		if( array_of_dupes.length > 0 )
@@ -197,57 +197,55 @@ function make_labels()
 		}
 	});
 
-	//show a loading message in case getJSON takes a while
-	$( '#myPdfList' ).html( '<li>Loading...</li>' );
-	$( "#myPdfList" ).show();	
+	//show a loading message in case ajax takes a while
+	$( '#myPdfList' ).html( '<progress>Loading...</progress>' );
+	$( '#myPdfList' ).show();	
 
 	//talk to the LabelSet.pm service
-	//var urlbase = '/labels?barcodes=';
-	//var url = urlbase + commasepbarcodes;
-
-
 	var url = '/labels';
 	var myData = {};
 
 	myData.barcodes = commasepbarcodes;
 
 	//request labels be made
-	$.ajax(
-	{
+	var promise1 = $.ajax({
 		url: url,
 		type: 'POST',
 		dataType: 'json',
 		async: false,
-		data: myData,
-		success: function (resp)
+		data: myData 
+	});
+	//this doesn't work how i expect:
+	var promise2 = $( '#myPdfList' ).html( '<progress>Loading...</progress>' ).promise();
+
+	$.when( promise1, promise2 ).done( 
+		function (resp)
 		{
 			//label files should now exist at this location:
-			var bookpdflink = resp['bookpdf'];
-			var discpdflink = resp['discpdf'];
+			var bookpdflink = resp[0]['bookpdf'];
+			var discpdflink = resp[0]['discpdf'];
 			
 			//how many labels did we get:
-			var donelabels = resp['donelabels'];  //hmm, is this how many are in both files?
+			var donelabels = resp[0]['donelabels'];  //hmm, is this how many are in both files?
 			
 			//timestamp is when the request was received
-			var timestamp = resp['timestamp'];
+			var timestamp = resp[0]['timestamp'];
 			
 			//show a link to the pdf file and set focus to the first link, so you can just hit enter again to get it
 			$( '#myPdfList' ).html( '' );
 			if ( bookpdflink != '/pdf/')
 			{
-				//console.log ( bookpdflink );
 				$( '#myPdfList' ).append( '<li> &#128215; Book: '+ timestamp + ' - <a id="myPdfLink1" target="_blank" href=' + bookpdflink +'>' + bookpdflink + '</a></li>');
 			}
 			if ( discpdflink != '/pdf/')
 			{
-				//console.log ( discpdflink );
 				$( '#myPdfList' ).append( '<li> &#128191; Disc: '+ timestamp + ' - <a id="myPdfLink2" target="_blank" href=' + discpdflink +'>' + discpdflink + '</a></li>');
 			}
 			$( "#myPdf" ).show();
+			$( "#myPdfList" ).show();	
 			$( '#myPdfLink1' ).focus();
 		}
-	});
-	
+	);	
 }
 
 $(document).ready(function(){

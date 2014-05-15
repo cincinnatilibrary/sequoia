@@ -1233,9 +1233,4 @@ sub compare_itemids {
     return $alpha cmp $beta;
 }
 
-sub is_plch_barcode {
-    my $barcode = shift;
-    return $barcode =~ / ^ (?: [0-9]{13} | A[0-9]{12} | [0-9]{2,7}-[0-9]{1,5}[0-9]{3,4} ) $/xms
-}
-
 1;

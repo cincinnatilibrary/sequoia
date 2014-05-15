@@ -1,67 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Sequoia - Bib</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./favicon.ico" rel="shortcut icon">
-  <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
-  <script src="./bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script src="./sequoia.js"></script>
-</head>
-<body>
+% layout 'default';
+
+<div id="bibTitle" >
+
+<form id="bibSearch" action="javascript:find_barcodes();" >
+  <fieldset>
+    <legend>Enter one bib record number: ( e.g. b10411914 ):</legend>
+    <input id="bibNumInput" type="text" />
+    ( icode1: <input id="icode1NumInput" type="text" value="all" size="3" /> )
+    <input type="submit" value="Find Items" />
+  </fieldset>
+</form>
+
+<p></p>
+<div id="bibItems" >
+  <ul id="myBarcodeList">
+  </ul>
+</div>
+
+<form id="makeLabels" action="javascript:make_labels();" style="display: none">
+  <input id="makeButton" type="submit" value="Make PDF" />
+</form>
+
+</div>
+
+<div id="myPdf">
+  <ul id="myPdfList">
+  </ul>
+</div>
+
+<footer class="navbar-default navbar-static-bottom">
   <div class="container">
-
-    <h1>On-Demand Labels</h1>
-
-    <div class="navbar navbar-default" role="navigation">
-      <div class="navbar-inner">
-        <div class="container" >
-          <ul class="nav navbar-nav">
-            <li><a href="./">Home</a></li>
-            <li class="active"><a href="./bib.html">by bib number</a></li>
-            <li><a href="./barcodes.html">by barcode</a></li>
-            <li><a href="./help.html">help</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div id="bibTitle" >
-
-    <form id="bibSearch" action="javascript:find_barcodes();" >
-      <fieldset>
-        <legend>Enter one bib record number: ( e.g. b10411914 ):</legend>
-        <input id="bibNumInput" type="text" />
-        ( icode1: <input id="icode1NumInput" type="text" value="all" size="3" /> )
-        <input type="submit" value="Find Items" />
-      </fieldset>
-    </form>
-
-    <p></p>
-    <div id="bibItems" >
-      <ul id="myBarcodeList">
-      </ul>
-    </div>
-
-    <form id="makeLabels" action="javascript:make_labels();" style="display: none">
-      <input id="makeButton" type="submit" value="Make PDF" />
-    </form>
-
-    </div>
-
-    <div id="myPdf">
-      <ul id="myPdfList">
-      </ul>
-    </div>
-
-    <footer class="navbar-default navbar-fixed-bottom">
-      <div class="container">
-        <p class="text-muted">DB Host is: <%= $db_host %></p>
-      </div>
-    </footer>
-
-  </div> 
-</body>
-</html>
+    <p class="text-muted">DB Host is: <%= $db_host %></p>
+  </div>
+</footer>
