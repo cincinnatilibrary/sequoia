@@ -55,6 +55,11 @@ get '/help.html' => sub {
 	$self->stash( db_host => $db_host );
 	$self->render('help');
 };
+get '/history.html' => sub {
+	my $self = shift;
+	$self->stash( db_host => $db_host );
+	$self->render('history');
+};
 
 
 #routes for the "API methods"

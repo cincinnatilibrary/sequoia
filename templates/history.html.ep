@@ -1,0 +1,31 @@
+%layout 'default';
+
+% use POSIX ();
+
+% my %history;
+% my @pdf_files = <./public/*.pdf>;
+% @pdf_files = sort @pdf_files;
+
+% for my $file ( @pdf_files ) {
+% 	my $mtime = (stat($file))[9];
+% 	my $time = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($mtime));
+%   $file =~ s/\/public//i;
+%   $history{$file} = $time;
+% }
+
+% my @sorted_keys = sort { $history{$a} cmp $history{$b} } keys %history;
+
+<div class="tab-pane" id="finished">
+	<table class="table table-striped" id="finishedTable">
+		<tbody>
+			<tr>
+				<th>Timestamp</th><th>File</th>
+			</tr>
+			<% for my $f ( @sorted_keys ) { %>
+				<tr>
+					<td><%= $history{$f} %></td><td><a href="<%= $f %>"><%= $f %></a></td>
+				</tr>
+			<% } %>
+		</tbody>
+	</table>
+</div>
