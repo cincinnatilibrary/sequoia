@@ -1,65 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Sequoia - Barcode Label Request</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./favicon.ico" rel="shortcut icon">
-  <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
-  <script src="./bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-  <script src="./sequoia.js"></script>
-</head>
-<body>
-  <div class="container">
+% layout 'default';
 
-    <h1>On-Demand Label Production: by Barcode</h1>
+<div id="bibTitle" >
+    
+  <form id="barcodeInputForm" action="javascript:add_barcodes();" >
+    <fieldset>
+      <legend>Enter list of barcodes: ( e.g. A000024164808, 1022641246015, ... ):</legend>
+      <textarea id="barcodeInputTextArea" class="" rows="10" cols="26" ></textarea>
+      <input type="submit" value="Process Input" />
+    </fieldset>
+  </form>
 
-    <div class="navbar navbar-default" role="navigation">
-      <div class="navbar-inner">
-        <div class="container" >
-          <ul class="nav navbar-nav">
-            <li><a href="./">Home</a></li>
-            <li><a href="./bib.html">by bib number</a></li>
-            <li class="active"><a href="./barcodes.html">by barcode</a></li>
-            <li><a href="./help.html">help</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <p></p>
 
-    <div id="bibTitle" >
-        
-      <form id="barcodeInputForm" action="javascript:add_barcodes();" >
-        <fieldset>
-          <legend>Enter list of barcodes: ( e.g. A000024164808, 1022641246015, ... ):</legend>
-          <textarea id="barcodeInputTextArea" class="" rows="10" cols="26" ></textarea>
-          <input type="submit" value="Process Input" />
-        </fieldset>
-      </form>
+  <ul id="myBarcodeList">
+  </ul>
 
-      <p></p>
+  <form id="makeLabels" action="javascript:make_labels();" style="display: none">
+    <input id="makeButton" type="submit" value="Make PDF" />
+  </form>
 
-      <ul id="myBarcodeList">
-      </ul>
+</div>
 
-      <form id="makeLabels" action="javascript:make_labels();" style="display: none">
-        <input id="makeButton" type="submit" value="Make PDF" />
-      </form>
-
-    </div>
-
-    <div id="myPdf">
-      <ul id="myPdfList">
-      </ul>
-    </div>
-
-    <footer class="navbar-default navbar-fixed-bottom">
-      <div class="container">
-        <p class="text-muted">DB Host is: <%= $db_host %></p>
-      </div>
-    </footer>
-
-  </div>
-</body>
-</html>
+<div id="myPdf">
+  <ul id="myPdfList">
+  </ul>
+</div>

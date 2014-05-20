@@ -19,10 +19,11 @@
       <div class="navbar-inner">
         <div class="container" >
           <ul class="nav navbar-nav">
-            <li class="active"><a href="./">Home</a></li>
-            <li><a href="./bib.html">by bib number</a></li>
-            <li><a href="./barcodes.html">by barcode</a></li>
-            <li><a href="./help.html">help</a></li>
+            <li <% if ( current_route eq '' ){ %> class="active" <% } %> ><a href="./">Home</a></li>
+            <li <% if ( current_route eq 'bibhtml' ){ %> class="active" <% } %> ><a href="./bib.html">by bib number</a></li>
+            <li <% if ( current_route eq 'barcodeshtml' ){ %> class="active" <% } %> ><a href="./barcodes.html">by barcode</a></li>
+            <li <% if ( current_route eq 'helphtml' ){ %> class="active" <% } %> ><a href="./help.html">help</a></li>
+            <li <% if ( current_route eq 'historyhtml' ){ %> class="active" <% } %> ><a href="./history.html">history</a></li>
           </ul>
         </div>
       </div>
