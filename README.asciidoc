@@ -17,22 +17,10 @@ This app is designed to be run in Docker, but it doesn't have to be.  It relies 
 
 * `git clone <this app>`
 * `cd sequoia`
-* `sudo docker.io build -t sequoia1 .`
-* `sudo docker.io run -e "DB_HOST=db.example.com" -e "DB_PORT=0" -e "DB_USER=sqlusername" -e "DB_PASS=secret" sequoia1`
+* `sudo docker.io build -t sequoia-image .`
+* `sudo docker.io run -d --name=sequoia-container -e "DB_HOST=db.example.com" -e "DB_PORT=0" -e "DB_USER=sqlusername" -e "DB_PASS=secret" sequoia-image`
 
-or 
-
-* `git clone <this app>`
-* `cd sequoia`
-* add these rows to `Dockerfile` before the `CMD` command.
-** `ENV DB_HOST db.example.com`
-** `ENV DB_PORT 0`
-** `ENV DB_USER sqlusername`
-** `ENV DB_PASS secret`
-* `sudo docker.io build -t sequoia1 .`
-* `sudo docker.io run sequoia1`
-
-I also need to use `--dns="<local-dns-server>"` in my `run` command.
+I also need to use `--dns="<local-dns-server>"` in my `run` command for my particular environment.
 
 == Pages
 
@@ -40,6 +28,7 @@ I also need to use `--dns="<local-dns-server>"` in my `run` command.
 * bib.html
 * barcodes.html
 * help.html
+* history.html
 
 == "API methods"
 
