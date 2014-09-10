@@ -28,6 +28,9 @@ my $db_pass = $ENV{'DB_PASS'};
 my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0,'pg_enable_utf8'=>1});
 
 
+# this is needed in order to tell hypnotoad what port to listen on:
+app->config(hypnotoad => {listen => ['http://*:3000']});
+
 #routes for the template pages
 #-----------------------------
 get '/' => sub {
@@ -57,6 +60,10 @@ get '/help.html' => sub {
 };
 get '/history.html' => sub {
 	my $self = shift;
+	my $delete_old = $self->param('delete_old');
+	#do the deleting here, not in the template
+	# delete_old_pdfs();  put this in a module?
+
 	$self->stash( db_host => $db_host );
 	$self->render('history');
 };
