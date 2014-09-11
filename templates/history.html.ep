@@ -13,7 +13,7 @@
 %   $history{$file} = $time;
 % }
 
-% my @sorted_keys = sort { $history{$a} cmp $history{$b} } keys %history;
+% my @sorted_keys = sort { $history{$b} cmp $history{$a} } keys %history;
 
 <div class="tab-pane" id="finished">
 	<table class="table table-striped" id="finishedTable">
