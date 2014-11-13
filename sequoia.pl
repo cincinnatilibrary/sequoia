@@ -16,7 +16,7 @@ BEGIN{
 #we'll see this whenever morbo restarts automatically for us
 app->log->debug( "is this thing on...?" );
 
-#Rotate passphrases 
+# Rotate passphrases
 # you should change these http://mojolicio.us/perldoc/Mojolicious#secrets
 app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
