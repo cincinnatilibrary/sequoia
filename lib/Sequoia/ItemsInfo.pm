@@ -1,11 +1,11 @@
 package Sequoia::ItemsInfo;
-  
+
 use strict;
 use warnings;
 
-sub items_info {	
+sub items_info {
 	my ( $dbh, @barcodes ) = @_;
-  
+
 	#TODO: error checking / input validation
 
 	if ( scalar @barcodes > 0 )
@@ -16,9 +16,9 @@ sub items_info {
 		$sql_query .= "sierra_view.bib_view.title ";
 		$sql_query .= "FROM sierra_view.bib_view, sierra_view.item_view, sierra_view.bib_record_item_record_link ";
 		$sql_query .= "WHERE sierra_view.bib_view.id = sierra_view.bib_record_item_record_link.bib_record_id ";
-		$sql_query .= "AND sierra_view.item_view.id = sierra_view.bib_record_item_record_link.item_record_id ";	
+		$sql_query .= "AND sierra_view.item_view.id = sierra_view.bib_record_item_record_link.item_record_id ";
 		$sql_query .= "AND sierra_view.item_view.barcode IN ( "  . join( " , ", ('?') x @barcodes ) . " ) ";  # insert a number of ? placeholders
-		$sql_query .= ";";	
+		$sql_query .= ";";
 
 		my $sth = $dbh->prepare($sql_query);
 		$sth->execute( @barcodes );
