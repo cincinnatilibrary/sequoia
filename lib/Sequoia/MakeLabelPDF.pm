@@ -1,8 +1,8 @@
 package Sequoia::MakeLabelPDF;
-  
+
 use strict;
 use warnings;
- 
+
 use DBI;
 use PDF::API2;
 
@@ -59,11 +59,11 @@ my %ict1_for_bcode2 = (
 	'w' => 'WEB-RSRCE',  #website?
 	'-' => 'UNKNOWN'
 	);
-	
+
 #translate a Sierra two-letter prefix into a three-letter agency code
 my %agency_for_two_letter_prefix = (
 		'1c' => 'CLC',
-		'1l' => 'CLC', 
+		'1l' => 'CLC',
 		'1h' => 'HOM',
 		'1p' => 'POP',
 		'1f' => 'POP',
@@ -74,17 +74,17 @@ my %agency_for_two_letter_prefix = (
 		'2s' => 'IRF',
 		'2g' => 'IRF',
 		'2e' => 'IRF',
-		'3r' => 'IRF', 
-		'3a' => 'IRF', 
-		'3h' => 'IRF', 
-		'3l' => 'IRF', 
-		'4d' => 'IRF', 
-		'2t' => 'TEE', 
-		'2k' => 'TEE', 
-		'2x' => 'TCR', 
+		'3r' => 'IRF',
+		'3a' => 'IRF',
+		'3h' => 'IRF',
+		'3l' => 'IRF',
+		'4d' => 'IRF',
+		'2t' => 'TEE',
+		'2k' => 'TEE',
+		'2x' => 'TCR',
 		'3d' => 'GEN',
-		'3g' => 'GEN', 
-		'3e' => 'GEN', 
+		'3g' => 'GEN',
+		'3e' => 'GEN',
 		'3c' => 'GEN',
 		'an' => 'AND',
 		'av' => 'AVO',
@@ -137,9 +137,9 @@ my %agency_for_two_letter_prefix = (
 		'5f' => 'FAC',
 		'5s' => 'FIN',
 		'5h' => 'HUM',
-		'5i' => 'LIB', 
+		'5i' => 'LIB',
 		'5p' => 'PRO',
-		'5m' => 'PUB', 
+		'5m' => 'PUB',
 		'5y' => 'SEC',
 		'5n' => 'SIS',
 		'5t' => 'TEC'
@@ -154,15 +154,15 @@ sub locn_floats{
 	my $location_code_4		= ( length $locn > 3 ) ? substr( $locn, 3, 1 ) : "";
 	my $location_code_5		= ( length $locn > 4 ) ? substr( $locn, 4, 1 ) : "";
 	my $shelf				= $location_code_4 . $location_code_5;
-	
+
 	#Sierra item location "suffixes"
 	my %is_floating_shelf	= map { $_ => 1 } qw( oo aa ab af al an ao ar au bd bg bi c cb cc ce cf cg ch ci ch ck cl cm cn co cp cq cr cs cv cw cx cy cz d da dc df dm dr ds dt du eb ec er es f fc ff fh fl fm fp fr fs fw gn ho in kl l lf ln mc nf nr od  pb pl ps pu sb se sf sl ss st tv v vf vm );
-	
+
 	return 1 if $is_floating_shelf{$shelf};
 
 	return 0;
 }
-	
+
 #says_floating is used to decide whether to put the word "Floating" on item labels
 sub says_floating {
     my %param = @_;
@@ -176,10 +176,10 @@ sub says_floating {
 
     return 0 if $ict1 eq 'VIDEO-VHS';
 
-	#main dvd's float    
+	#main dvd's float
     #SIERRA: MAIN = 1; "DVD/Videocassette" = "101"
-    return 1 if $libr eq '1' && $ityp eq '101';  
-    
+    return 1 if $libr eq '1' && $ityp eq '101';
+
     #pop library
 	if ($location_code_1_2 eq '1p' )
 	{
@@ -208,9 +208,9 @@ sub get_info_for_requested_items {
 	# Get bib and item data from SQL for requested items
 	#
 	#---------------------------------------------------
-	
+
     use List::Util qw( min );
-    
+
     my ( $dbh, $label_request_ref, $item_info_ref ) = @_;
 
 	#puts the itemids into an array.
@@ -233,18 +233,18 @@ sub get_info_for_requested_items {
 	$sql_query .= "item_view.location_code, ";
 	$sql_query .= "item_view.itype_code_num, ";
 	$sql_query .= "item_view.agency_code_num, ";
-	
+
 	$sql_query .= "sierra_view.bib_record_item_record_link.id, ";
 	$sql_query .= "sierra_view.bib_view.title, ";
 	$sql_query .= "sierra_view.bib_view.bcode2, ";
-	
+
 	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
 	$sql_query .= "FROM sierra_view.varfield_view ";
 	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.item_view.record_num AND ";
 	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'i' AND ";
 	$sql_query .= "		 sierra_view.varfield_view.varfield_type_code = 'c' ";
 	$sql_query .= "LIMIT 1 ) as item_callnum, ";		#callnum from the item record ( rather than from the bib )
-	
+
 	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
 	$sql_query .= "FROM sierra_view.varfield_view ";
 	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
@@ -305,12 +305,12 @@ sub get_info_for_requested_items {
 	$sql_query .= "FROM sierra_view.varfield_view, sierra_view.volume_view, sierra_view.volume_record_item_record_link ";
 	$sql_query .= "WHERE sierra_view.varfield_view.record_id = sierra_view.volume_view.id ";
 	$sql_query .= "AND sierra_view.volume_view.id = sierra_view.volume_record_item_record_link.volume_record_id ";
-	$sql_query .= "AND sierra_view.volume_record_item_record_link.item_record_id = sierra_view.item_view.id "; 
+	$sql_query .= "AND sierra_view.volume_record_item_record_link.item_record_id = sierra_view.item_view.id ";
 	$sql_query .= "AND sierra_view.varfield_view.record_type_code = 'j' ";
 	$sql_query .= "AND sierra_view.varfield_view.varfield_type_code = 'v' ";
 	$sql_query .= "ORDER BY field_content DESC ";
 	$sql_query .= "LIMIT 1 ) as volume_statement ";
-	
+
 	$sql_query .= "FROM sierra_view.item_view ";
 
 	#join the bib
@@ -318,18 +318,18 @@ sub get_info_for_requested_items {
 	$sql_query .= "ON sierra_view.item_view.id = sierra_view.bib_record_item_record_link.item_record_id ";
 	$sql_query .= "JOIN sierra_view.bib_view ";
 	$sql_query .= "ON sierra_view.bib_record_item_record_link.bib_record_id = sierra_view.bib_view.id ";
-	
+
 	$sql_query .= "WHERE sierra_view.item_view.barcode IN ( " . join( " , ", map { qq/'$_'/ } @itemids ) . " ) "; #TODO: replace this with SQL placeholders
-	
+
 	$sql_query .= ";";
-	
+
 	#start timing the SQL query
 	my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
 	my $hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
 	#print "query start at ".$hhmmss."...\n";
-	
+
 	my $sth = $dbh->prepare($sql_query);
-	
+
 	$sth->execute();
 
 	#end timing the SQL query
@@ -342,7 +342,7 @@ sub get_info_for_requested_items {
 	while( my $item_info = $sth->fetchrow_hashref() )
 	{
 		$items_info_found +=1;
-		
+
 		#libr - used to decide floating by the says_floating function
 		my $libr = $item_info->{'agency_code_num'};
 
@@ -379,7 +379,7 @@ sub get_info_for_requested_items {
 				#something's not right
 				$ict2 = 'ADULT';
 			}
-			
+
 			#get agency from first two chars
 			if ( $is_branch_prefix{$location_code_1_2} )
 			{
@@ -390,7 +390,7 @@ sub get_info_for_requested_items {
 			{
 				#look up what agency in the lookup table
 				$agency = $agency_for_two_letter_prefix{$location_code_1_2};
-				
+
 				if (  $item_info->{'location_code'} eq '5fac' )
 				{
 					$agency = 'FAC';
@@ -410,7 +410,7 @@ sub get_info_for_requested_items {
 			}
 		}
 
-		
+
 		#itype code num -> ityp  ??
 		my $ityp = $item_info->{'itype_code_num'};
 		if ( $ityp eq '0' )
@@ -429,7 +429,7 @@ sub get_info_for_requested_items {
 			$title = substr( $title, $begin, ( length($title) - $begin ) );  #cut off the whole first subfield and take the rest
 		}
 		#misc other subfield id's
-		$title =~ s/\|a//i;	
+		$title =~ s/\|a//i;
 		$title =~ s/\|b/ /i;
 		$title =~ s/\|c/ /i;
 		$title =~ s/\|h/ /i;
@@ -450,13 +450,13 @@ sub get_info_for_requested_items {
 			my $begin = index ( $author, '|', 2 );  #find the next subfield after the first one, which was the |6
 			$author = substr( $author, $begin, ( length($author) - $begin ) );  #cut off the whole first subfield and take the rest
 		}
-        $author =~ s/\|a//i;	
+        $author =~ s/\|a//i;
         $author = substr($author, 0, index($author, ',')) if index($author, ',') > -1;
 		$author =~ s/\.$//i;
 
 		#call number
 		my $callnum = ( defined $item_info->{'callnum'} ) ? $item_info->{'callnum'} : '';
-		$callnum =~ s/,//i;	
+		$callnum =~ s/,//i;
 
 		#classification
 		my $callclass = "";
@@ -466,7 +466,7 @@ sub get_info_for_requested_items {
 			$callclass = 'SUDOC';
 			$callnum = $item_info->{'marc086'};
 		}
-		
+
 		#take callnum from item instead of bib.  overrides preceeding lines of code.
 		#$callnum = ( defined $item_info->{'item_callnum'} ) ? $item_info->{'item_callnum'} : $callnum;
 
@@ -484,25 +484,25 @@ sub get_info_for_requested_items {
 			}
 		}
 
-		$callnum =~ s/\|a//i;	
+		$callnum =~ s/\|a//i;
 		$callnum =~ s/\|b/ /i;
-		if 	( 	( $ict2 eq 'JUVENILE' ) and 
+		if 	( 	( $ict2 eq 'JUVENILE' ) and
 				( $callnum !~ /Easy/i or $callnum =~ /^PL-Spoken/i ) and
 				( $ityp ne '100' and $ityp ne '101' )
 			)
 		{
 			$callnum = "j$callnum";
 		}
-        
+
         $callnum = "R$callnum" if $is_reference_type{$ityp};
-        
+
         $callnum =~ s/\b(v|no|pt)[.] +(\d+)/$1.$2/i;
 
 		#start counting item pieces
 		#--------------------------
         my $book_pieces = 0;
         my $disc_pieces = 0;
-        
+
         my $marc300 = "";
         if ( defined $item_info->{'marc300'} )
         {
@@ -518,7 +518,7 @@ sub get_info_for_requested_items {
         my @subfields = split / [ ]* [+] [ ]* /xms, $marc300;
         my $first = shift @subfields;
         $first = "" unless (defined $first);
-        
+
         for my $subsection (split / [ ]* [+] [ ]* /xms, $first) {
             if ($subsection =~ / ^ (\d+) \D+ (?: disc | dvd | cd | video ) /xmsi) {
                 $disc_pieces += $1;
@@ -527,7 +527,7 @@ sub get_info_for_requested_items {
                 $book_pieces += $1;
             }
         }
-        
+
         if ($is_disc_category{$ict1}) {
             $disc_pieces = 1 if $disc_pieces == 0;
         }
@@ -545,15 +545,15 @@ sub get_info_for_requested_items {
                 $book_pieces += $1;
             }
         }
-        
+
         my $marc955_pieces = 1;
         if ( defined $item_info->{'marc955'} )
-        { 
-			$item_info->{'marc955'} =~ s/\|a//i;
-			if ($item_info->{'marc955'} =~ /([0-9]+)/ ) 
-			{
-				$marc955_pieces = $1;
-			}
+	{
+	    $item_info->{'marc955'} =~ s/\|a//i;
+	    if ($item_info->{'marc955'} =~ /([0-9]+)/ )
+	    {
+		$marc955_pieces = $1;
+	    }
         }
         #end counting item pieces
         #------------------------
@@ -594,7 +594,7 @@ sub produce_and_distribute_labels {
 	# This works by building the %book_labels_for and %disc_labels_for
 	#
 	#---------------------------------------------------------
-	
+
     use integer; #for the division when calculating the period
 
     my ($label_request_ref, $item_info_ref, $arg_ref) = @_;
@@ -603,20 +603,20 @@ sub produce_and_distribute_labels {
     $arg_ref->{'outputdir'} = '/test' unless exists $arg_ref->{'outputdir'} && defined $arg_ref->{'outputdir'};
     my %book_labels_for;
     my %disc_labels_for;
-    
+
     my @done_labels;
 
 	#TODO: rewrite this whole set of nested loops.  requires changed the shape of label_request_ref.
-    
+
     for my $date (keys %{$label_request_ref}) {
-    
+
         for my $uacs (keys %{$label_request_ref->{$date}}) {
 
             ITEM_FOR_USER:
             for my $itemid (keys %{$label_request_ref->{$date}{$uacs}}) {
-				
+
                 next ITEM_FOR_USER unless exists $item_info_ref->{$itemid};
-                
+
                 push( @done_labels, $item_info_ref->{$itemid}{'record_num'} );
                 my $period;
                 if ($arg_ref->{'organize'} eq 'replacements') {
@@ -627,7 +627,7 @@ sub produce_and_distribute_labels {
                     $minutes -= $minutes % $granularity;
                     $period = sprintf "%02d:%02d", $minutes / 60, $minutes % 60;
                 }
-                
+
                 if ($is_disc_category{ $item_info_ref->{$itemid}{'ict1'} }) {
                     push @{$disc_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$label_request_ref->{$date}{$uacs}{$itemid}, 'pieces'=>$item_info_ref->{$itemid}{'disc_pieces'} };
                     if ($item_info_ref->{$itemid}{'book_pieces'} > 0) {
@@ -670,7 +670,7 @@ sub create_label_PDFs {
 	# For a given item, create the PDF
 	#
 	#------------------------------------
-	
+
     use English;
     use List::Util qw( first );
     use Net::FTP;
@@ -678,16 +678,16 @@ sub create_label_PDFs {
 
     my ( $item_info_ref, $tag, $requests_ref, $workdir ) = @_;
     my $add_label_ref = ($tag eq 'Disc') ? \&add_disc_label : \&add_book_label;
-    
+
     my $local_filename = "";
     my $local_filename_with_path = "";
 
     for my $user (keys %{$requests_ref}) {
-        
+
         for my $date (keys %{$requests_ref->{$user}} ) {
 
             for my $period ( keys %{$requests_ref->{$user}{$date}} ) {
-                
+
 				#local name should be connected to what LabelSet thinks it is.  Hmm...
 				# there needs to be one file for book and one for disc?
 				# also they need to not clobber each other with multiple people working at the same time
@@ -696,7 +696,7 @@ sub create_label_PDFs {
 				my $bar = scalar @foo ;
 				my $baz = $foo[0]; #file name will be based on first barcode in the file
 				my $qux = $baz->{'itemid'};
-				
+
 				$local_filename = $tag.".".$qux.".pdf";
                 $local_filename_with_path = File::Spec->catfile($workdir, $local_filename);
 
@@ -718,61 +718,27 @@ sub create_label_PDFs {
                     'helvetica' => $pdf->corefont( 'Helvetica',      '-encoding' => 'utf8' ),
                     'helveticabold'   => $pdf->corefont( 'Helvetica-Bold', '-encoding' => 'utf8' ),
 
-                    
+
                     #this font contains more foreign characters
                     #RHEL5
                     #'normal' 		=> $pdf->ttfont( '/usr/share/fonts/dejavu-lgc/DejaVuLGCSansCondensed.ttf' , '-encoding' => 'utf8' ),
-                    #'bold' 	=> $pdf->ttfont( '/usr/share/fonts/dejavu-lgc/DejaVuLGCSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),  
+                    #'bold' 	=> $pdf->ttfont( '/usr/share/fonts/dejavu-lgc/DejaVuLGCSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),
                     #UBUNTU trusty
                     #'normal' 		=> $pdf->ttfont( '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansCondensed.ttf' , '-encoding' => 'utf8' ),
-                    #'bold' 	=> $pdf->ttfont( '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),  
+                    #'bold' 	=> $pdf->ttfont( '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),
                     #'normal' => $pdf->corefont( 'Helvetica',      '-encoding' => 'utf8' ),
                     #'bold'   => $pdf->corefont( 'Helvetica-Bold', '-encoding' => 'utf8' ),
                     #LOCAL
                     'normal' => $pdf->ttfont( './fonts/dejavu-lgc-fonts-ttf-2.34/ttf/DejaVuLGCSansCondensed.ttf' , '-encoding' => 'utf8' ),
-                    'bold' => $pdf->ttfont( './fonts/dejavu-lgc-fonts-ttf-2.34/ttf/DejaVuLGCSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),  
+                    'bold' => $pdf->ttfont( './fonts/dejavu-lgc-fonts-ttf-2.34/ttf/DejaVuLGCSansCondensed-Bold.ttf' , '-encoding' => 'utf8' ),
                 };
 
                 my $label_count = 0;
                 my @labels = ();
-                
+
                 #Sort the labels
-                if ($user eq 'Replace') {
-                    @labels = sort { 
-						$item_info_ref->{ $a->{'itemid'} }{'agency'} cmp $item_info_ref->{ $b->{'itemid'} }{'agency'} || 
-						$item_info_ref->{ $a->{'itemid'} }{'callnum'} cmp $item_info_ref->{ $b->{'itemid'} }{'callnum'}
-						}
-						@{ $requests_ref->{$user}{$date}{$period} };
-                }
-                elsif ( $user eq 'OnDemand' )
-                {
-                	if  ($tag eq 'Disc')
-                	{
-                		#sort AV by location, then by volume
-	                    @labels = sort { 
-							$item_info_ref->{ $a->{'itemid'} }{'locn'} cmp $item_info_ref->{ $b->{'itemid'} }{'locn'} ||
-							$item_info_ref->{ $a->{'itemid'} }{'callnum'} cmp $item_info_ref->{ $b->{'itemid'} }{'callnum'}
-							}
-							@{ $requests_ref->{$user}{$date}{$period} };					
-					}
-					else
-					{
-						#sort books by volume, then location
-	                    @labels = sort { 
-							$item_info_ref->{ $a->{'itemid'} }{'callnum'} cmp $item_info_ref->{ $b->{'itemid'} }{'callnum'} ||
-							$item_info_ref->{ $a->{'itemid'} }{'locn'} cmp $item_info_ref->{ $b->{'itemid'} }{'locn'}
-							}
-							@{ $requests_ref->{$user}{$date}{$period} };
-					}
-				}
-                else {
-                    @labels = sort { 
-						$a->{'time'} cmp $b->{'time'} || 
-						compare_itemids($a->{'itemid'}, $b->{'itemid'}) 
-						} 
-						@{ $requests_ref->{$user}{$date}{$period} };
-                }
-                
+                @labels = sort { $a->{'time'} cmp $b->{'time'} || compare_itemids($a->{'itemid'}, $b->{'itemid'}) } @{ $requests_ref->{$user}{$date}{$period} };
+
                 for my $request_ref ( @labels ) {
                     my $itemid = $request_ref->{'itemid'};
                     my $time   = $request_ref->{'time'};
@@ -782,14 +748,10 @@ sub create_label_PDFs {
                 }
                 $pdf->save;
                 $pdf->end();
-
             }
-            
         }
-        
     }
-
-	#TODO: return the filename here?
+    #TODO: return the filename here?
     return $local_filename;
 }
 
@@ -799,7 +761,7 @@ sub add_disc_label {
 	# Creates an AV label
 	#
 	#------------------------------------
-	
+
     use PDF::API2;
     #use Sequoia::Floating;
     use constant in => 1 / 72; # 1 inch = 72 points
@@ -880,7 +842,7 @@ sub add_disc_label {
         $gfx->textlabel( 105  /pt,  63/pt, $font{'helveticabold'},  8/pt, $this_items{'copy'}  , '-align' => 'center' );
         #print "hub label copy:  ".$this_items{'copy'}."\n";
         #print "hub label piece: ".$req_ref->{'piece'}."\n";
-        
+
         #put the call number on the hub sticker
         $gfx->textstart;
         $gfx->font($font{'bold'}, 6/pt);
@@ -957,7 +919,7 @@ sub add_book_label {
 	# Creates a Book label
 	#
 	#------------------------------------
-	
+
     use PDF::API2;
     #use Sequoia::Floating;
     use constant in => 1 / 72; # 1 inch = 72 points
@@ -1028,7 +990,7 @@ sub get_spine_lines {
 	# For a given item, determine what appears on the spine
 	#
 	#------------------------------------
-	
+
     my $item_ref = shift;
     my @results = ($item_ref->{'callclass'} eq 'SUDOC') ? (split / [:]+ /xms, $item_ref->{'callnum'}, 5) : (split / [ ]+ /xms, $item_ref->{'callnum'}, 5);
 
