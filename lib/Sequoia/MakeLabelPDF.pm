@@ -238,6 +238,8 @@ sub get_info_for_requested_items {
 	$sql_query .= "sierra_view.bib_view.title, ";
 	$sql_query .= "sierra_view.bib_view.bcode2, ";
 
+	$sql_query .= "sierra_view.record_metadata.record_last_updated_gmt, ";
+
 	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
 	$sql_query .= "FROM sierra_view.varfield_view ";
 	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.item_view.record_num AND ";
@@ -319,7 +321,12 @@ sub get_info_for_requested_items {
 	$sql_query .= "JOIN sierra_view.bib_view ";
 	$sql_query .= "ON sierra_view.bib_record_item_record_link.bib_record_id = sierra_view.bib_view.id ";
 
-	$sql_query .= "WHERE sierra_view.item_view.barcode IN ( " . join( " , ", map { qq/'$_'/ } @itemids ) . " ) "; #TODO: replace this with SQL placeholders
+	#join the item record metadata
+	$sql_query .= "JOIN sierra_view.record_metadata ";
+	$sql_query .= "  ON sierra_view.record_metadata.id = sierra_view.item_view.id ";
+	$sql_query .= " AND sierra_view.record_metadata.record_type_code = 'i' ";
+
+	$sql_query .= "WHERE sierra_view.item_view.barcode IN ( " . join( " , ", ('?')x@itemids ) . " ) ";
 
 	$sql_query .= ";";
 
@@ -330,7 +337,7 @@ sub get_info_for_requested_items {
 
 	my $sth = $dbh->prepare($sql_query);
 
-	$sth->execute();
+	$sth->execute( @itemids );
 
 	#end timing the SQL query
 	( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
@@ -579,6 +586,7 @@ sub get_info_for_requested_items {
 		$item_info_ref->{$barcode}{'ict2'}        = $ict2;
 		$item_info_ref->{$barcode}{'book_pieces'} = min ($book_pieces, $marc955_pieces);
 		$item_info_ref->{$barcode}{'disc_pieces'} = min ($disc_pieces, $marc955_pieces);
+		$item_info_ref->{$barcode}{'updated_gmt'} = ( defined $item_info->{'record_last_updated_gmt'} ) ? $item_info->{'record_last_updated_gmt'} : "";
     }
 
     return;
