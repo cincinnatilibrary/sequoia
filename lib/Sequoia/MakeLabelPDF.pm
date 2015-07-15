@@ -549,11 +549,11 @@ sub get_info_for_requested_items {
         my $marc955_pieces = 1;
         if ( defined $item_info->{'marc955'} )
 	{
-	    $item_info->{'marc955'} =~ s/\|a//i;
-	    if ($item_info->{'marc955'} =~ /([0-9]+)/ )
-	    {
-		$marc955_pieces = $1;
-	    }
+            $item_info->{'marc955'} =~ s/\|a//i;
+            if ($item_info->{'marc955'} =~ /([0-9]+)/ )
+            {
+                $marc955_pieces = $1;
+            }
         }
         #end counting item pieces
         #------------------------
