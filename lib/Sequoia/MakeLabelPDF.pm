@@ -637,15 +637,15 @@ sub produce_and_distribute_labels {
                 }
 
                 if ($is_disc_category{ $item_info_ref->{$itemid}{'ict1'} }) {
-                    push @{$disc_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$label_request_ref->{$date}{$uacs}{$itemid}, 'pieces'=>$item_info_ref->{$itemid}{'disc_pieces'} };
+                    push @{$disc_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$item_info_ref->{$itemid}{'updated_gmt'}, 'pieces'=>$item_info_ref->{$itemid}{'disc_pieces'} };
                     if ($item_info_ref->{$itemid}{'book_pieces'} > 0) {
-                        push @{$book_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$label_request_ref->{$date}{$uacs}{$itemid}, 'pieces'=>$item_info_ref->{$itemid}{'book_pieces'} };
+                        push @{$book_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$item_info_ref->{$itemid}{'updated_gmt'}, 'pieces'=>$item_info_ref->{$itemid}{'book_pieces'} };
                     }
                 }
                 else {
-                    push @{$book_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$label_request_ref->{$date}{$uacs}{$itemid}, 'pieces'=>$item_info_ref->{$itemid}{'book_pieces'} };
+                    push @{$book_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$item_info_ref->{$itemid}{'updated_gmt'}, 'pieces'=>$item_info_ref->{$itemid}{'book_pieces'} };
                     if ($item_info_ref->{$itemid}{'disc_pieces'} > 0) {
-                        push @{$disc_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$label_request_ref->{$date}{$uacs}{$itemid}, 'pieces'=>$item_info_ref->{$itemid}{'disc_pieces'} };
+                        push @{$disc_labels_for{$uacs}{$date}{$period}}, {'itemid'=>$itemid, 'time'=>$item_info_ref->{$itemid}{'updated_gmt'}, 'pieces'=>$item_info_ref->{$itemid}{'disc_pieces'} };
                     }
                 }
             }
