@@ -18,4 +18,4 @@ WORKDIR /srv/www
 EXPOSE 3000
 
 #DOOOOOOOOOOOOM!
-CMD morbo sequoia.pl
+CMD morbo -l http://0.0.0.0:3000 sequoia.pl
