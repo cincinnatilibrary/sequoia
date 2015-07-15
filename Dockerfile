@@ -1,16 +1,21 @@
-#Gets us what we need for Mojo to work
-FROM octohost/mojolicious
+# switched to trusty because it's LTS
+FROM ubuntu:trusty
 
 #Pre-req's
 RUN apt-get update
-RUN apt-get install -y libdbd-pg-perl libpdf-api2-perl
+RUN apt-get install -y build-essential
+RUN apt-get install -y cpanminus
+RUN apt-get install -y postgresql libpq-dev
+RUN cpanm Mojolicious
+RUN cpanm PDF::API2
+RUN cpanm DBD::Pg
 
-#This is necessary, but I'm not 100% why
+#add app dir
 ADD . /srv/www
 WORKDIR /srv/www
 
 #TODO: can this be overridden at run time?
 EXPOSE 3000
 
-#DOOOOOOOOOOOOM! 
-CMD hypnotoad -f sequoia.pl
+#DOOOOOOOOOOOOM!
+CMD morbo sequoia.pl
