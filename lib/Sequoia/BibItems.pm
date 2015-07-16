@@ -3,9 +3,6 @@ package Sequoia::BibItems;
 use strict;
 use warnings;
 
-use strict;
-use warnings;
-
 use Scalar::Util qw(looks_like_number);
 
 sub items_for_bib_number
