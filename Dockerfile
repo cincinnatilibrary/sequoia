@@ -1,21 +1,24 @@
 # switched to trusty because it's LTS
 FROM ubuntu:trusty
 
+MAINTAINER Dave Menninger <dave.menninger@gmail.com>
+
 #Pre-req's
-RUN apt-get update
-RUN apt-get install -y build-essential
-RUN apt-get install -y cpanminus
-RUN apt-get install -y postgresql libpq-dev
-RUN cpanm Mojolicious
-RUN cpanm PDF::API2
-RUN cpanm DBD::Pg
+RUN apt-get update && apt-get install -y \
+	build-essential \
+	cpanminus \
+	libpq-dev \
+	postgresql
+RUN cpanm DBD::Pg \
+	Mojolicious \
+	PDF::API2
 
 #add app dir
 ADD . /srv/www
 WORKDIR /srv/www
 
-#TODO: can this be overridden at run time?
+# expose port
 EXPOSE 3000
 
-#DOOOOOOOOOOOOM!
+# start server
 CMD morbo -l http://0.0.0.0:3000 sequoia.pl
