@@ -587,6 +587,7 @@ sub get_info_for_requested_items {
 		$item_info_ref->{$barcode}{'book_pieces'} = min ($book_pieces, $marc955_pieces);
 		$item_info_ref->{$barcode}{'disc_pieces'} = min ($disc_pieces, $marc955_pieces);
 		$item_info_ref->{$barcode}{'updated_gmt'} = ( defined $item_info->{'record_last_updated_gmt'} ) ? $item_info->{'record_last_updated_gmt'} : "";
+		$item_info_ref->{$barcode}{'icode1'} = ( defined $item_info->{'icode1'} ) ? $item_info->{'icode1'} : "";
     }
 
     return;
@@ -789,7 +790,7 @@ sub add_disc_label {
 
     #Header
     $this_items{'disc_pieces'} .= '*' if ($this_items{'book_pieces'} > 0);
-    $gfx->textlabel( 14/pt, 284/pt, $font{'bold'},  8/pt, join(" $middot ", $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'disc_pieces'}) );
+    $gfx->textlabel( 14/pt, 284/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'disc_pieces'}) );
     fit_text($gfx,  14/pt, 272/pt, $font{'bold'},  8/pt, $this_items{'title'}, 150/pt, {'-elipsis' => '...'});
 
     #Ownership Label 1/2
@@ -949,7 +950,7 @@ sub add_book_label {
 
     #Header
     $this_items{'book_pieces'} .= '*' if ($this_items{'disc_pieces'} > 0);
-    $gfx->textlabel( 25/pt, 209/pt, $font{'bold'},  8/pt, join(" $middot ", $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'book_pieces'}) );
+    $gfx->textlabel( 25/pt, 209/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'book_pieces'}) );
     fit_text($gfx, 25/pt, 197/pt, $font{'bold'},  8/pt, $this_items{'title'}, 190/pt, {'-elipsis' => '...'});
 
     #print the barcode
