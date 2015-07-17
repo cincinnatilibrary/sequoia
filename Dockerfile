@@ -21,4 +21,5 @@ WORKDIR /srv/www
 COPY . /srv/www
 
 # start server
-CMD morbo -l http://0.0.0.0:3000 sequoia.pl
+ENTRYPOINT [ "morbo" ]
+CMD [ "-l http://0.0.0.0:3000", "sequoia.pl" ]
