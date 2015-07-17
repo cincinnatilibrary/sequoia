@@ -22,11 +22,11 @@ function find_barcodes()
 	//get JSON-formatted list of barcodes for this bibnumber
 	// this is talking to BibItems.pm
 	var request_url = "/bibitems?bibnumber="+bibnumber+"&icode1="+icode1;
-	$.getJSON( request_url, function( resp ) 
+	$.getJSON( request_url, function( resp )
 	{
 		//there should only be one key
 		//this is a dumb way to find out what it is
-		$.each( resp, function( key, value ) 
+		$.each( resp, function( key, value )
 		{
 			bibnumber = key;
 		});
@@ -67,7 +67,7 @@ function find_barcodes()
 				my_bc_list += '<li>' + bc + '</li>';
 			}
 		});
-		
+
 		var dupe_warning_message = "This title contains duplicate barcodes!";
 
 		if( array_of_dupes.length > 0 )
@@ -76,19 +76,19 @@ function find_barcodes()
 			my_bc_list += "<br/>" + dupe_warning_message;
 			alert( dupe_warning_message );
 		}
-		
+
 		//show the result list
 		$( "#myBarcodeList" ).html( my_bc_list );
 		$( "#makeLabels" ).show();
-		
+
 		//focus on the button, so you can just hit enter again
 		$( "#makeButton" ).focus();
-		
+
 		//hide the previous pdf link if there was one
 		$( "#myPdfList" ).hide();
 
 	});
-} 
+}
 
 //------------------------------------------------------------
 // - used by barcodes.html to take the list of barcodes entered by the user and validate it
@@ -114,7 +114,7 @@ function add_barcodes()
 	// talk to the ItemsInfo.pm service
 	//var urlbase = '/itemsinfo?barcodes=';
 	//var url = urlbase + my_bc_list;
-	var bc_list_html = '';	
+	var bc_list_html = '';
 	var array_of_good_bc = [];
 	//$.getJSON( url, function( resp )
 
@@ -135,11 +135,11 @@ function add_barcodes()
 		success: function (resp)
 		{
 			//add barcodes to the html list
-			for (var i = 0; i < array_of_bc.length; i++) 
+			for (var i = 0; i < array_of_bc.length; i++)
 			{
 				if( array_of_bc[i] != '' ) //avoid adding nulls, this should be redundant
-				{				
-					if (typeof resp[ array_of_bc[i] ] != 'undefined') 
+				{
+					if (typeof resp[ array_of_bc[i] ] != 'undefined')
 					{
 						bc_list_html += '<li class="itemfound">  &#10003; ';
 						bc_list_html += array_of_bc[i];
@@ -159,27 +159,27 @@ function add_barcodes()
 			//save barcodes into localStorage for later use
 			localStorage.setItem('barcodes', '[ "' + array_of_good_bc.join('" , "') + '"] '  );
 			//localStorage.setItem('barcodes', '[ "' + array_of_bc.join('" , "') + '"] '  );
-			//TODO: remove this from localStorage at some point with removeItem		
+			//TODO: remove this from localStorage at some point with removeItem
 
 			//show the result html list
 			$( "#myBarcodeList" ).html( bc_list_html );
 			$( "#makeLabels" ).show();
 		}
 	});
-	
+
 	//focus on the make button, so you can just hit enter again
 	$( "#makeButton" ).focus();
-	
+
 	//hide the previous pdf link if there was one
 	$( "#myPdfList" ).hide();
 
-} 
+}
 
 //------------------------------------------------------------
 // used by both bib.html and barcodes.html to create a PDF of labels from a list of barcodes
 //------------------------------------------------------------
 function make_labels()
-{	
+{
 	//pull saved list of barcodes from localStorage
 	var barcodesstring = localStorage.getItem('barcodes');
 	var parsedbarcodes = JSON.parse( barcodesstring );
@@ -199,7 +199,7 @@ function make_labels()
 
 	//show a loading message in case ajax takes a while
 	$( '#myPdfList' ).html( '<progress>Loading...</progress>' );
-	$( '#myPdfList' ).show();	
+	$( '#myPdfList' ).show();
 
 	//talk to the LabelSet.pm service
 	var url = '/labels';
@@ -213,26 +213,34 @@ function make_labels()
 		type: 'POST',
 		dataType: 'json',
 		async: false,
-		data: myData 
+		data: myData
 	});
 	//this doesn't work how i expect:
 	var promise2 = $( '#myPdfList' ).html( '<progress>Loading...</progress>' ).promise();
 
-	$.when( promise1, promise2 ).done( 
+	$.when( promise1, promise2 ).done(
 		function (resp)
 		{
 			//label files should now exist at this location:
 			var bookpdflink = resp[0]['bookpdf'];
 			var discpdflink = resp[0]['discpdf'];
-			
+
 			//how many labels did we get:
 			var donelabels = resp[0]['donelabels'];  //hmm, is this how many are in both files?
-			
+
 			//timestamp is when the request was received
 			var timestamp = resp[0]['timestamp'];
-			
+
 			//show a link to the pdf file and set focus to the first link, so you can just hit enter again to get it
 			$( '#myPdfList' ).html( '' );
+			if ( parsedbarcodes.length != donelabels )
+			{
+				$( '#myPdfList' ).append( '<li class="itemnotfound"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
+			}
+			else
+			{
+				$( '#myPdfList' ).append( '<li class="itemfound"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
+			}
 			if ( bookpdflink != '/pdf/')
 			{
 				$( '#myPdfList' ).append( '<li> &#128215; Book: '+ timestamp + ' - <a id="myPdfLink1" target="_blank" href=' + bookpdflink +'>' + bookpdflink + '</a></li>');
@@ -242,10 +250,10 @@ function make_labels()
 				$( '#myPdfList' ).append( '<li> &#128191; Disc: '+ timestamp + ' - <a id="myPdfLink2" target="_blank" href=' + discpdflink +'>' + discpdflink + '</a></li>');
 			}
 			$( "#myPdf" ).show();
-			$( "#myPdfList" ).show();	
+			$( "#myPdfList" ).show();
 			$( '#myPdfLink1' ).focus();
 		}
-	);	
+	);
 }
 
 $(document).ready(function(){
@@ -255,7 +263,7 @@ $(document).ready(function(){
 		var tooLong = 8000;
 		var re_pattern = /^(\w|\s|,|-)+$/;
 
-		var currentString = $( "#barcodeInputTextArea" ).val(); 
+		var currentString = $( "#barcodeInputTextArea" ).val();
 
 		if ( currentString.length > tooLong || !(re_pattern.test(currentString)) )
 		{
