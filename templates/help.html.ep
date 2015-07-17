@@ -1,9 +1,9 @@
 % layout 'default';
 
 <h1>Help</h1>
-  
+
 <br/>
-  
+
 <h4>By Bib Number</h4>
 <p>
   <ul>
@@ -23,7 +23,7 @@
     <li>The input box turns red if there is a problem with the input.   Problems include: bad characters, too many barcodes.
   </ul>
 </p>
-  
+
 <br/>
 
 <h4>Troubleshooting</h4>
@@ -34,9 +34,3 @@
     <li>you are using IE in Compatibility Mode</li>
   </ul>
 </p>
-
-<footer class="navbar-default navbar-fixed-bottom">
-  <div class="container">
-    <p class="text-muted">DB Host is: <%= $db_host %></p>
-  </div>
-</footer>

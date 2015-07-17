@@ -25,9 +25,3 @@
   <ul id="myPdfList">
   </ul>
 </div>
-
-<footer class="navbar-default navbar-static-bottom">
-  <div class="container">
-    <p class="text-muted">DB Host is: <%= $db_host %></p>
-  </div>
-</footer>

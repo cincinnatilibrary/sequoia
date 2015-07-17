@@ -32,6 +32,12 @@
 
     <%= content %>
 
-    </div>
-  </body>
+    <footer class="navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <p class="text-muted">DB Host is: <%= $db_host %></p>
+      </div>
+    </footer>
+
+  </div>
+</body>
 </html>
