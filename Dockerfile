@@ -13,12 +13,12 @@ RUN cpanm DBD::Pg \
 	Mojolicious \
 	PDF::API2
 
-#add app dir
-ADD . /srv/www
-WORKDIR /srv/www
-
 # expose port
 EXPOSE 3000
+
+#add app dir
+WORKDIR /srv/www
+COPY . /srv/www
 
 # start server
 CMD morbo -l http://0.0.0.0:3000 sequoia.pl
