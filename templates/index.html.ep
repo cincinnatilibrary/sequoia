@@ -1,5 +1,5 @@
 %layout 'default';
 
 <div class="jumbotron">
-  <p>DB Host is: <%= $db_host %></p>
+  <p>Sequoia is an on-demand label creation application for Sierra at PLCH.</p>
 </div>

@@ -56,7 +56,7 @@ function find_barcodes()
 				console.log("dupe: " + bc);
 				array_of_dupes.push( bc );
 				//my_bc_list += '<li>' + bc + '</li>';
-				my_bc_list += '<li class="itemnotfound"> &#10005; ';
+				my_bc_list += '<li class="text-danger"> &#10005; ';
 				my_bc_list += bc;
 				my_bc_list += ' &mdash; Item has duplicate barcode.';
 			}
@@ -141,14 +141,14 @@ function add_barcodes()
 				{
 					if (typeof resp[ array_of_bc[i] ] != 'undefined')
 					{
-						bc_list_html += '<li class="itemfound">  &#10003; ';
+						bc_list_html += '<li class="text-success">  &#10003; ';
 						bc_list_html += array_of_bc[i];
 						bc_list_html += ' &mdash; ' + resp[ array_of_bc[i] ].title; // + ' &#8599; ';
 						array_of_good_bc.push( array_of_bc[i] );
 					}
 					else
 					{
-						bc_list_html += '<li class="itemnotfound"> &#10005; ';
+						bc_list_html += '<li class="text-danger"> &#10005; ';
 						bc_list_html += array_of_bc[i];
 						bc_list_html += ' &mdash; Item not found.';
 					}
@@ -235,11 +235,11 @@ function make_labels()
 			$( '#myPdfList' ).html( '' );
 			if ( parsedbarcodes.length != donelabels )
 			{
-				$( '#myPdfList' ).append( '<li class="itemnotfound"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
+				$( '#myPdfList' ).append( '<li class="text-danger"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
 			}
 			else
 			{
-				$( '#myPdfList' ).append( '<li class="itemfound"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
+				$( '#myPdfList' ).append( '<li class="text-success"> you asked for ' + parsedbarcodes.length + ' barcodes and got back ' + donelabels + ' pages.</li>' );
 			}
 			if ( bookpdflink != '/pdf/')
 			{
@@ -248,6 +248,10 @@ function make_labels()
 			if ( discpdflink != '/pdf/')
 			{
 				$( '#myPdfList' ).append( '<li> &#128191; Disc: '+ timestamp + ' - <a id="myPdfLink2" target="_blank" href=' + discpdflink +'>' + discpdflink + '</a></li>');
+			}
+			if ( donelabels > 0 )
+			{
+				$( '#myPdfList' ).append( '<li> these will be available at <a href="/history.html">the History</a> ( until they are deleted or Sequoia is restarted. )');
 			}
 			$( "#myPdf" ).show();
 			$( "#myPdfList" ).show();
@@ -416,11 +420,13 @@ $(document).ready(function(){
 		if ( currentString.length > tooLong || !(re_pattern.test(currentString)) )
 		{
 			$( "#barcodeInputTextArea" ).addClass("inputBadShadow");
+			//$( "#barcodeInputForm" ).addClass("has-error");
 			//$( "#barcodeInputTextArea" ).after( "<br/>input is very long.  be patient." );
 		}
 		if ( currentString.length < tooLong && re_pattern.test(currentString) )
 		{
 			$( "#barcodeInputTextArea" ).removeClass("inputBadShadow")
+			//$( "#barcodeInputForm" ).removeClass("has-error");
 		}
 
 	});

@@ -29,7 +29,7 @@
 		</table>
 
 		<form class="form" id="makeLabels" action="javascript:make_labels();">
-			<button class="btn" id="makeButton" type="submit">Make PDF</button>
+			<button class="btn btn-success" id="makeButton" type="submit">Make PDF</button>
 		</form>
 
 		<div id="myPdf">

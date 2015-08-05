@@ -6,7 +6,7 @@
       <legend>Enter one bib record number: ( e.g. b10411914 ):</legend>
       <input id="bibNumInput" type="text" />
       ( icode1: <input id="icode1NumInput" type="text" value="all" size="3" /> )
-      <input type="submit" value="Find Items" />
+      <button class="btn btn-primary" type="submit">Find Items</button>
     </fieldset>
   </form>
 
@@ -17,7 +17,7 @@
   </div>
 
   <form id="makeLabels" action="javascript:make_labels();" style="display: none">
-    <input id="makeButton" type="submit" value="Make PDF" />
+    <button class="btn btn-success" id="makeButton" type="submit">Make PDF</button>
   </form>
 </div>
 
