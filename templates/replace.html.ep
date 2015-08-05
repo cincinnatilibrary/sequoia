@@ -1,0 +1,44 @@
+%layout 'default';
+
+<div class="container">
+
+	<div id="bibTitle" >
+
+
+		<form class="form" id="barcodeInputForm" action="javascript:add_request();">
+			<fieldset>
+			<legend>Request a replacement label:</legend>
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Enter one barcode: ( e.g. A000024164808 )" id="barcodeInput">
+			</div>
+			<button type="submit" class="btn btn-primary">Request</button>
+			</fieldset>
+		</form>
+
+		<p></p>
+
+		<ul id="myBarcodeList">
+		</ul>
+
+		<h3>Existing Requests:</h3>
+
+		<table class="table table-striped" id="myRequestTable">
+			<tbody>
+				<tr><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Printed Date</th></tr>
+			</tbody>
+		</table>
+
+		<form class="form" id="makeLabels" action="javascript:make_labels();">
+			<button class="btn" id="makeButton" type="submit">Make PDF</button>
+		</form>
+
+		<div id="myPdf">
+			<ul id="myPdfList">
+		</ul>
+</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+   show_requests();
+</script>

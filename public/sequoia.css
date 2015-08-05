@@ -1,13 +1,15 @@
-li.itemfound
-{
+body {
+    padding-bottom: 75px;
+}
+
+li.itemfound {
 	color: #005500;
 }
 
-li.itemnotfound
-{
+li.itemnotfound {
 	color: #770000;
 }
 
-textarea.inputBadShadow{
+textarea.inputBadShadow {
     box-shadow: 0 0 10px 5px #990000;
 }

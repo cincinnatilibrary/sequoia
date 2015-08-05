@@ -26,6 +26,16 @@
 
 <br/>
 
+<h4>Adding a Request</h4>
+<p>
+	<ul>
+		<li>Enter one barcode at a time</li>
+		<li>If the barcode is in the list already, the old instance will be replaced by the new instance.</li>
+	</ul>
+</p>
+
+<br/>
+
 <h4>Troubleshooting</h4>
 <p>
   This site may not work right if:

@@ -11,6 +11,7 @@ BEGIN{
 	use Sequoia::BibItems;
 	use Sequoia::ItemsInfo;
 	use Sequoia::LabelSet;
+	use Sequoia::ReplacementRequests;
 }
 
 #we'll see this whenever morbo restarts automatically for us
@@ -68,6 +69,13 @@ get '/history.html' => sub {
 	$self->render('history');
 };
 
+get '/replace.html' => sub {
+	my $self = shift;
+	$self->stash( db_host => $db_host );
+	$self->render('replace');
+};
+
+
 
 #routes for the "API methods"
 #----------------------------
@@ -93,6 +101,18 @@ any '/labels' => sub {
 	my @barcodes = split( ',' , $barcodes_list );
 
 	$self->render(json => Sequoia::LabelSet::label_set( $dbh, @barcodes ) );
+};
+
+any 'addreplacementrequest' => sub {
+	my $self = shift;
+	my $barcode = $self->param('barcode');
+	my $title = $self->param('title');
+
+	# stash the barcodes to somewhere
+	Sequoia::ReplacementRequests::add_request_to_request_list( $barcode, $title );
+
+	# return the current ( now updated ) list of requests in JSON
+	$self->render( json => Sequoia::ReplacementRequests::request_list() );
 };
 
 

@@ -256,6 +256,154 @@ function make_labels()
 	);
 }
 
+//------------------------------------------------------------
+// - used by replace.html to take the list of barcodes entered by the user and add it to the json list
+//------------------------------------------------------------
+function add_request()
+{
+	//reset display to blank
+	$( '#myList' ).html( my_bc_list );
+	//$( "#makeLabels" ).hide();
+
+	//TODO: refactor this to only take one barcode at a time
+
+	//get the list of barcodes the user entered and clean it up
+	var my_bc_list = '';
+	my_bc_list = $( '#barcodeInput').val();
+	my_bc_list = my_bc_list.replace(/\s+/g, '');  //remove whitespace
+	my_bc_list = my_bc_list.replace(/,+/g, ''); //remove commas
+	my_bc_list = my_bc_list.toUpperCase(); //because whatever
+
+	//parse the textareinput into a json array
+	var array_of_bc = my_bc_list.split(",");
+
+	//check the barcodes against this API to see if they are real:
+	// talk to the ItemsInfo.pm service
+	var urlbase = '/itemsinfo?barcodes=';
+	var url = urlbase + my_bc_list;
+	var bc_list_html = '';
+	var array_of_good_bc = [];
+	var good_bc_list = '';
+	var good_bc = '';
+	var good_title = '';
+	//$.getJSON( url, function( resp )
+	var myData ={};
+	$.ajax({
+		url: url,
+		dataType: 'json',
+		async: false,
+		data: myData,
+		success: function (resp)
+		{
+			//add barcodes to the html list
+			for (var i = 0; i < array_of_bc.length; i++) {
+				if( array_of_bc[i] != '' ) //avoid adding nulls, this should be redundant
+				{
+					if (typeof resp[ array_of_bc[i] ] != 'undefined')
+					{
+						bc_list_html += '<div class="alert alert-success">';
+						bc_list_html += '<span class="glyphicon glyphicon-ok"></span> ';
+						bc_list_html += array_of_bc[i];
+						bc_list_html += ' &mdash; ' + resp[ array_of_bc[i] ].title; // + ' &#8599; ';
+						good_bc = array_of_bc[i] ;
+						good_title = resp[ array_of_bc[i] ].title;
+					}
+					else
+					{
+						bc_list_html += '<div class="alert alert-danger">';
+						bc_list_html += '<span class="glyphicon glyphicon-remove"></span> ';
+						bc_list_html += array_of_bc[i];
+						bc_list_html += ' &mdash; Item not found.';
+					}
+					bc_list_html += ' </div>';
+				}
+			}
+
+			//show the result html list
+			$( "#myBarcodeList" ).html( bc_list_html );
+		}
+	});
+
+	if ( good_bc != "" )
+	{
+		//add the barcodes to the request list on the server:
+		// talk to the AddReplacementRequest.pm service
+		var urlbase = '/addreplacementrequest?barcodes=';
+		var url = urlbase + good_bc;
+
+		myData.barcode = good_bc;
+		myData.title = good_title;
+		//console.log( "bc:"+myData.barcode );
+		//console.log( "title:"+myData.title );
+		$.ajax({
+			url: url,
+			type: 'POST',
+			dataType: 'json',
+			async: false,
+			data: myData,
+			success: function (resp)
+			{
+				//clear rows in place
+				$("#myRequestTable").find("tr:gt(0)").remove();
+
+				//sort these results
+				var sortable = [];
+				for (var r in resp )
+				{
+					sortable.push([resp[r].request_timestamp, r, resp[r].title]);
+				}
+				sortable.sort().reverse();//function(a, b) {return a[1] - b[1]});
+
+				for( var s in sortable)
+				{
+					$("#myRequestTable").find('tbody').append( "<tr><td>"+sortable[s][0]+"</td><td>"+sortable[s][1]+"</td><td>"+sortable[s][2]+"</td><td>TODO</td></tr>" ) ;
+				}
+			}
+		});
+	}//else good_bc was blank
+}
+
+//------------------------------------------------------------
+// - used by replace.html to load the list of requests on the server and display it
+//------------------------------------------------------------
+function show_requests()
+{
+	//reset display to blank
+	$( '#myList' ).html( "" );
+
+	//load existing requests from file on server
+	var urlbase = './replacementrequests.json';
+	var url = urlbase ;
+	var rq_list_html = '';
+	var barcodes = [];
+
+	$.getJSON( url, function( resp )
+	{
+		//clear rows in place
+		$("#myRequestTable").find("tr:gt(0)").remove();
+
+		//sort these results
+		var sortable = [];
+		for (var r in resp )
+		{
+			sortable.push([resp[r].request_timestamp, r, resp[r].title]);
+			barcodes.push(r);
+		}
+		sortable.sort().reverse();//function(a, b) {return a[1] - b[1]});
+
+		for( var s in sortable)
+		{
+			$("#myRequestTable").find('tbody').append( "<tr><td>"+sortable[s][0]+"</td><td>"+sortable[s][1]+"</td><td>"+sortable[s][2]+"</td><td>TODO</td></tr>" ) ;
+		}
+
+		//show the result html list
+		$( "#myRequestList" ).html( rq_list_html );
+
+		localStorage.setItem('barcodes', '[ "' + barcodes.join('", "') + '"] '  );
+	});
+}
+
+
 $(document).ready(function(){
 	$( "#barcodeInputTextArea" ).bind("keyup change input", function() {
 		//check barcodes entered for potential problems
