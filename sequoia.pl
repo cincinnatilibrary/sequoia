@@ -22,7 +22,7 @@ app->log->debug( "is this thing on...?" );
 app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
 # DB Setup
-my $db_host = $ENV{'DB_HOST'};;
+my $db_host = $ENV{'DB_HOST'};
 my $db_port = $ENV{'DB_PORT'};
 my $db_user = $ENV{'DB_USER'};
 my $db_pass = $ENV{'DB_PASS'};
