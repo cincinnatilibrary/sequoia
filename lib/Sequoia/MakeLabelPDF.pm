@@ -1145,7 +1145,7 @@ sub oneline_sticker {
     return;
 }
 
-sub fit_text() {
+sub fit_text {
     use PDF::API2;
     my ($obj, $x, $y, $face, $size, $text, $width, $opt_ref) = @_;
 
