@@ -31,6 +31,7 @@
 
 			<button class="btn btn-success" id="makeButton" type="submit" formaction="javascript:make_labels();" >Make PDF of these Requests</button>
 			<button class="btn btn-danger pull-right" id="ArchiveButton" type="submot" formaction="javascript:archive_requests();" >Archive Selected Requests</button>
+			<br/><input id="archivePassword" class="pull-right" type="text" value="password"></input>
 		</form>
 
 		<div id="myPdf">
@@ -42,7 +43,7 @@
 
 		<table class="table table-striped" id="myArchiveTable">
 			<tbody>
-				<tr><th>Archived Date</th><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Printed Date</th></tr>
+				<tr><th>Archived Date</th><th>Requested Date</th><th>Barcode</th><th>Title</th></tr>
 			</tbody>
 		</table>
 	</div>

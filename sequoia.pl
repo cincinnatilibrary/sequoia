@@ -28,6 +28,7 @@ my $db_user = $ENV{'DB_USER'};
 my $db_pass = $ENV{'DB_PASS'};
 my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0,'pg_enable_utf8'=>1});
 
+my $archive_password = $ENV{'ARCHIVE_PASSWORD'};
 
 # this is needed in order to tell hypnotoad what port to listen on:
 app->config(hypnotoad => {listen => ['http://*:3000']});
@@ -119,10 +120,17 @@ any 'archivereplacementrequests' => sub {
 	my $self = shift;
 	my $barcodes_list = $self->param('barcodes');
 	my @barcodes = split( ',', $barcodes_list );
+	my $password = $self->param('password');
 	$self->stash( db_host => $db_host );
 
-	#move requests from replacementrequests.json to archivedreqests.json
-	$self->render( json => Sequoia::ReplacementRequests::archive_requests( @barcodes ) );
+	if ( $password eq $archive_password ){
+		#move requests from replacementrequests.json to archivedreqests.json
+		$self->render( json => Sequoia::ReplacementRequests::archive_requests( @barcodes ) );
+	}
+	else{
+		#do nothing
+		$self->render( json => { 'error' => 'bad password' } );
+	}
 };
 
 #run the app

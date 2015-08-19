@@ -462,7 +462,7 @@ function show_requests()
 						+"</td><td>"+sortable[s][1]
 						+"</td><td>"+sortable[s][2]
 						+"</td><td>"+sortable[s][3]
-						+"</td><td>TODO</td></tr>" ) ;
+						+"</td></tr>" ) ;
 			}
 
 			//show the result html list
@@ -475,21 +475,18 @@ function show_requests()
 
 function archive_requests()
 {
-	console.log( "hello" );
-	console.log ( $('input[type=checkbox]:checked') );
 	var checked = [];
 	$('input[type=checkbox]:checked').each( function(){
 		checked.push( $(this).val() );
 	});
 	var barcodes_string = checked.join(',');
 
-	console.log ( barcodes_string );
-
 	urlbase = './archivereplacementrequests';
 	url = urlbase ;
 	var myData = {};
 
 	myData.barcodes = barcodes_string;
+	myData.password = $('#archivePassword').val();
 
 	$.ajax({
 		url: url,
@@ -499,7 +496,13 @@ function archive_requests()
 		data: myData,
 		success: function( resp )
 		{
-			show_requests();
+			if (typeof resp.error !== 'undefined'){
+				//error ( bad password )
+				$('#archivePassword').val( 'password' ).select().focus();
+			}
+			else{
+				show_requests();
+			}
 		}
 	});
 }
