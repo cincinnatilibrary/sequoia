@@ -115,6 +115,15 @@ any 'addreplacementrequest' => sub {
 	$self->render( json => Sequoia::ReplacementRequests::request_list() );
 };
 
+any 'archivereplacementrequests' => sub {
+	my $self = shift;
+	my $barcodes_list = $self->param('barcodes');
+	my @barcodes = split( ',', $barcodes_list );
+	$self->stash( db_host => $db_host );
+
+	#move requests from replacementrequests.json to archivedreqests.json
+	$self->render( json => Sequoia::ReplacementRequests::archive_requests( @barcodes ) );
+};
 
 #run the app
 app->start;

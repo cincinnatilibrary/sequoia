@@ -20,22 +20,31 @@
 		<ul id="myBarcodeList">
 		</ul>
 
-		<h3>Existing Requests:</h3>
+		<h3>Current Requests:</h3>
 
-		<table class="table table-striped" id="myRequestTable">
-			<tbody>
-				<tr><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Printed Date</th></tr>
-			</tbody>
-		</table>
+		<form class="form" id="makeLabels" >
+			<table class="table table-striped" id="myRequestTable">
+				<tbody>
+					<tr><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Archive</th></tr>
+				</tbody>
+			</table>
 
-		<form class="form" id="makeLabels" action="javascript:make_labels();">
-			<button class="btn btn-success" id="makeButton" type="submit">Make PDF</button>
+			<button class="btn btn-success" id="makeButton" type="submit" formaction="javascript:make_labels();" >Make PDF of these Requests</button>
+			<button class="btn btn-danger pull-right" id="ArchiveButton" type="submot" formaction="javascript:archive_requests();" >Archive Selected Requests</button>
 		</form>
 
 		<div id="myPdf">
 			<ul id="myPdfList">
-		</ul>
-</div>
+			</ul>
+		</div>
+
+		<h3>Archived Requests:</h3>
+
+		<table class="table table-striped" id="myArchiveTable">
+			<tbody>
+				<tr><th>Archived Date</th><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Printed Date</th></tr>
+			</tbody>
+		</table>
 	</div>
 </div>
 

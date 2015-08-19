@@ -360,7 +360,16 @@ function add_request()
 
 				for( var s in sortable)
 				{
-					$("#myRequestTable").find('tbody').append( "<tr><td>"+sortable[s][0]+"</td><td>"+sortable[s][1]+"</td><td>"+sortable[s][2]+"</td><td>TODO</td></tr>" ) ;
+					$("#myRequestTable").find('tbody').append( "<tr>"
+							+"<td>"+sortable[s][0]
+							+"</td><td>"+sortable[s][1]
+							+"</td><td>"+sortable[s][2]
+							+"</td><td>"+'<input '
+							+'type="checkbox" '
+							+'name="barcodes_to_archive" '
+							+'value="'+sortable[s][1]+'" '+
+							'>Archive</input>'
+						+"</td></tr>" ) ;
 				}
 			}
 		});
@@ -381,29 +390,117 @@ function show_requests()
 	var rq_list_html = '';
 	var barcodes = [];
 
-	$.getJSON( url, function( resp )
-	{
-		//clear rows in place
-		$("#myRequestTable").find("tr:gt(0)").remove();
-
-		//sort these results
-		var sortable = [];
-		for (var r in resp )
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		cache: false,
+		success: function( resp )
 		{
-			sortable.push([resp[r].request_timestamp, r, resp[r].title]);
-			barcodes.push(r);
-		}
-		sortable.sort().reverse();//function(a, b) {return a[1] - b[1]});
+			//clear rows in place
+			$("#myRequestTable").find("tr:gt(0)").remove();
 
-		for( var s in sortable)
+			//sort these results
+			var sortable = [];
+			for (var r in resp )
+			{
+				sortable.push([resp[r].request_timestamp, r, resp[r].title]);
+				barcodes.push(r);
+			}
+			sortable.sort().reverse();//function(a, b) {return a[1] - b[1]});
+
+			for( var s in sortable)
+			{
+				$("#myRequestTable").find('tbody').append( "<tr>"
+						+"<td>"+sortable[s][0]
+						+"</td><td>"+sortable[s][1]
+						+"</td><td>"+sortable[s][2]
+						+"</td><td>"+'<input '
+							+'type="checkbox" '
+							+'name="barcodes_to_archive" '
+							+'value="'+sortable[s][1]+'" '+
+							'>Archive</input>'
+						+"</td></tr>" ) ;
+			}
+
+			//show the result html list
+			//$( "#myRequestList" ).html( rq_list_html );
+
+			localStorage.setItem('barcodes', '[ "' + barcodes.join('", "') + '"] '  );
+		}
+	});
+
+	//load existing requests from file on server
+	urlbase = './archivedrequests.json';
+	url = urlbase ;
+	rq_list_html = '';
+	barcodes = [];
+
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		cache: false,
+		success: function( resp )
 		{
-			$("#myRequestTable").find('tbody').append( "<tr><td>"+sortable[s][0]+"</td><td>"+sortable[s][1]+"</td><td>"+sortable[s][2]+"</td><td>TODO</td></tr>" ) ;
+			//clear rows in place
+			$("#myArchiveTable").find("tr:gt(0)").remove();
+
+			//sort these results
+			var sortable = [];
+			for (var r in resp )
+			{
+				sortable.push([ resp[r].archive_timestamp, resp[r].request_timestamp, r, resp[r].title ]);
+				barcodes.push(r);
+			}
+			sortable.sort().reverse();//function(a, b) {return a[1] - b[1]});
+
+			for( var s in sortable)
+			{
+				$("#myArchiveTable").find('tbody').append( "<tr>"
+						+"<td>"+sortable[s][0]
+						+"</td><td>"+sortable[s][1]
+						+"</td><td>"+sortable[s][2]
+						+"</td><td>"+sortable[s][3]
+						+"</td><td>TODO</td></tr>" ) ;
+			}
+
+			//show the result html list
+			$( "#myRequestList" ).html( rq_list_html );
+
+			//localStorage.setItem('barcodes', '[ "' + barcodes.join('", "') + '"] '  );
 		}
+	});
+}
 
-		//show the result html list
-		$( "#myRequestList" ).html( rq_list_html );
+function archive_requests()
+{
+	console.log( "hello" );
+	console.log ( $('input[type=checkbox]:checked') );
+	var checked = [];
+	$('input[type=checkbox]:checked').each( function(){
+		checked.push( $(this).val() );
+	});
+	var barcodes_string = checked.join(',');
 
-		localStorage.setItem('barcodes', '[ "' + barcodes.join('", "') + '"] '  );
+	console.log ( barcodes_string );
+
+	urlbase = './archivereplacementrequests';
+	url = urlbase ;
+	var myData = {};
+
+	myData.barcodes = barcodes_string;
+
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		cache: false,
+		data: myData,
+		success: function( resp )
+		{
+			show_requests();
+		}
 	});
 }
 
