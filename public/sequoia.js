@@ -365,6 +365,7 @@ function add_request()
 							+"</td><td>"+sortable[s][1]
 							+"</td><td>"+sortable[s][2]
 							+"</td><td>"+'<input '
+							+'class="checkall" '
 							+'type="checkbox" '
 							+'name="barcodes_to_archive" '
 							+'value="'+sortable[s][1]+'" '+
@@ -416,6 +417,7 @@ function show_requests()
 						+"</td><td>"+sortable[s][1]
 						+"</td><td>"+sortable[s][2]
 						+"</td><td>"+'<input '
+							+'class="checkall" '
 							+'type="checkbox" '
 							+'name="barcodes_to_archive" '
 							+'value="'+sortable[s][1]+'" '+
@@ -476,7 +478,7 @@ function show_requests()
 function archive_requests()
 {
 	var checked = [];
-	$('input[type=checkbox]:checked').each( function(){
+	$('input.checkall[type=checkbox]:checked').each( function(){
 		checked.push( $(this).val() );
 	});
 	var barcodes_string = checked.join(',');
@@ -529,5 +531,9 @@ $(document).ready(function(){
 			//$( "#barcodeInputForm" ).removeClass("has-error");
 		}
 
+	});
+
+	$('#select-all-checkbox').change(function(e){
+		$('.checkall').prop('checked',this.checked);
 	});
 });

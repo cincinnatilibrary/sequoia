@@ -25,7 +25,12 @@
 		<form class="form" id="makeLabels" >
 			<table class="table table-striped" id="myRequestTable">
 				<tbody>
-					<tr><th>Requested Date</th><th>Barcode</th><th>Title</th><th>Archive</th></tr>
+					<tr>
+						<th>Requested Date</th>
+						<th>Barcode</th>
+						<th>Title</th>
+						<th>Archive (<input id="select-all-checkbox" type="checkbox">Select All</input>)</th>
+					</tr>
 				</tbody>
 			</table>
 
