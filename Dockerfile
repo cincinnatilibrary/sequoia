@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 	postgresql
 RUN cpanm DBD::Pg \
 	Mojolicious \
+	Config::Simple \
 	PDF::API2
 
 # expose port

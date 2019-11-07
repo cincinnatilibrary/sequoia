@@ -22,10 +22,20 @@ app->log->debug( "is this thing on...?" );
 app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
 # DB Setup
-my $db_host = $ENV{'DB_HOST'};
-my $db_port = $ENV{'DB_PORT'};
-my $db_user = $ENV{'DB_USER'};
-my $db_pass = $ENV{'DB_PASS'};
+# my $db_host = $ENV{'DB_HOST'};
+# my $db_port = $ENV{'DB_PORT'};
+# my $db_user = $ENV{'DB_USER'};
+# my $db_pass = $ENV{'DB_PASS'};
+
+# pull config paramaters in from config file instead of using env:
+use Config::Simple;
+my $cfg = new Config::Simple('sequoia.cfg');
+
+my $db_host = $cfg->param("db_host");
+my $db_port = $cfg->param("db_port");
+my $db_user = $cfg->param("db_user");
+my $db_pass = $cfg->param("db_pass");
+
 my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0,'pg_enable_utf8'=>1});
 
 my $archive_password = $ENV{'ARCHIVE_PASSWORD'};

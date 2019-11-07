@@ -29,7 +29,7 @@ my %spine_gets_copy   = map { $_ => 1 } qw( CD-BOOK CD-MUSIC CASS-BOOK CASS-MUSI
 
 #substr ( location_code, 0 , 2 ):
 my %is_main_prefix 		= map { $_ => 1 } qw( 1c 1l 1h 1p 1f 2m 2n 3n 2r 2s 2g 2e 3d 3r 3a 3h 3l 4d 2t 2k 2x 3g 3e 3c 4c 4v 5a 5c 5o 5v 5d 5f 5s 5h 5i 5p 5m 5y 5n 5t );
-my %is_branch_prefix 	= map { $_ => 1 } qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy os );
+my %is_branch_prefix 	= map { $_ => 1 } qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy os ts);
 
 #translate Sierra bcode2 into a Symphony ict1
 my %ict1_for_bcode2 = (
@@ -142,12 +142,13 @@ my %agency_for_two_letter_prefix = (
 		'5m' => 'PUB',
 		'5y' => 'SEC',
 		'5n' => 'SIS',
-		'5t' => 'TEC'
+		'5t' => 'TEC',
+        'ts' => "BR"
 		);
 
 my %ityp_is_floating  = map {$_=>1} qw( 1 3 5 21 23 158 160 );  #SIERRA: ityp code numbers.
 my %ityp_can_float    = map {$_=>1} qw( BOOK 0 2 4 20 22 60 61 70 71 72 77 78 90 91 92 101 157 159 );  #SIERRA: itype code numbers.
-my %libr_is_branch    = map {$_=>1} qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy );  #take the branch prefix from location_code
+my %libr_is_branch    = map {$_=>1} qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy ts);  #take the branch prefix from location_code
 
 sub locn_floats{
 	my $locn = shift;
@@ -173,6 +174,11 @@ sub says_floating {
 
 	my $location_code_1_2 	= substr( $locn, 0, 2 );
 	$libr = $location_code_1_2;
+
+    # RV DEBUG
+    # print STDERR "params: ityp: $ityp\t ict1: $ict1\t libr: $libr\t locn: $locn\n";
+    # RV 2019-10-31 agency TS is floating 
+    return 1 if $libr eq 'ts';
 
     return 0 if $ict1 eq 'VIDEO-VHS';
 
@@ -391,7 +397,15 @@ sub get_info_for_requested_items {
 			if ( $is_branch_prefix{$location_code_1_2} )
 			{
 				#branches are two-letter codes
-				$agency = uc ( $location_code_1_2 );
+                if ($location_code_1_2 eq 'ts')
+                {
+                    $agency = 'BR'
+                }
+                else 
+                {
+                    $agency = uc ( $location_code_1_2 );
+                }
+				
 			}
 			else
 			{
@@ -417,6 +431,8 @@ sub get_info_for_requested_items {
 			}
 		}
 
+        #RV DEBUG
+        print STDERR "agency: $agency\n";
 
 		#itype code num -> ityp  ??
 		my $ityp = $item_info->{'itype_code_num'};
@@ -974,6 +990,9 @@ sub add_book_label {
     if ( says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
         $gfx->textlabel( 258/pt, 120/pt, $font{'helveticabold'}, 14/pt, 'Floating', '-align' => 'center' );
     }
+
+    # RV DEBUG
+    # print STDERR "agency: $this_items{'agency'}\n";
 
     my $line_text = $use_callnum{$this_items{'ityp'}} ? join(' ', $this_items{'callnum'}, $this_items{'copy'}, $this_items{'agency'}) : $this_items{'title'};
     fit_text($gfx, 95/pt, 96/pt, $font{'normal'},  8/pt, $line_text, 150/pt, {'-align' => 'center', '-elipsis' => '...', '-atom' => 'word'});
