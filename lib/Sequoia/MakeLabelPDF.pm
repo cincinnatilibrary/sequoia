@@ -432,7 +432,7 @@ sub get_info_for_requested_items {
 		}
 
         #RV DEBUG
-        print STDERR "agency: $agency\n";
+        #print STDERR "agency: $agency\n";
 
 		#itype code num -> ityp  ??
 		my $ityp = $item_info->{'itype_code_num'};

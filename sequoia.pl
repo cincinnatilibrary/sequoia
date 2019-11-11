@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 use Mojolicious::Lite;
 
 use DBI;
@@ -29,7 +30,7 @@ app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
 # pull config paramaters in from config file instead of using env:
 use Config::Simple;
-my $cfg = new Config::Simple('sequoia.cfg');
+my $cfg = new Config::Simple('/home/plchuser/app/sequoia/sequoia.cfg');
 
 my $db_host = $cfg->param("db_host");
 my $db_port = $cfg->param("db_port");

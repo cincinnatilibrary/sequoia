@@ -1,0 +1,10 @@
+[Unit]
+Description=Sequoia Mojolicious application
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/plchuser/app/sequoia/sequoia.pl daemon -m production -l http://*:8080
+
+[Install]
+WantedBy=multi-user.target

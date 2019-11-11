@@ -1,5 +1,6 @@
 = Sequoia
 Dave Menninger
+Ray Voelker
 
 == Overview
 
@@ -10,6 +11,26 @@ Sequoia is an on-demand label creation app for Sierra ILS from Innovative Interf
 This code started out working with a different ILS, running on a different platform, and wrapped in various different wrappers over time.  The meat of the code in MakeLabelPDF.pm that does most of the heavy lifting is at least a decade old and has been contributed to by 2-3 authors.
 
 The label sizes, types, fonts, layout, etc, are all hard-coded in for our local purposes.  Re-writing those parts of the code to be more configurable would be nice.
+
+== How to run this app in a production env
+
+This app can be run in a Docker env (as explained below) but may more easily be run in a more traditional way
+
+* move to the desination directory where you want to run the app
+* `git clone https://github.com/plch/sequoia.git`
+* `cd sequoia`
+* create the config file (`sequoia.cfg`) that will define the database it's pointed to. It will look similar to this:
+```
+db_host: sierra-db.cincinnatilibrary.org
+db_port: 1032
+db_user: DB_USERNAME_HERE
+db_pass: DB_PASSWORD_HERE
+```
+* check the path for the config in the file `sequoia.pl`. It may look something like this:
+`my $cfg = new Config::Simple('/home/plchuser/app/sequoia/sequoia.cfg');`
+* setup the apache2 server to act as a reverse proxy for the app. More details can be found in the `apache2_config` directory
+* set the app to run at startup via systemd. More details can be found in the `systemd_scripts` directory. Note, that you must also set the correct path for the target app in the script.
+
 
 == How to run this app in Docker
 
