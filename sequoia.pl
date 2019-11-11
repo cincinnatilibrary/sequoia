@@ -42,7 +42,11 @@ my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$
 my $archive_password = $ENV{'ARCHIVE_PASSWORD'};
 
 # this is needed in order to tell hypnotoad what port to listen on:
-app->config(hypnotoad => {listen => ['http://*:3000']});
+app->config(hypnotoad => {
+	listen => ['http://127.0.0.1:8080'],
+	proxy => 1,
+	}
+);
 
 #routes for the template pages
 #-----------------------------

@@ -4,7 +4,11 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/plchuser/app/sequoia/sequoia.pl daemon -m production -l http://*:8080
+User=plchuser
+Group=plchuser
+ExecStart=/home/plchuser/app/sequoia/run_sequoia.sh
+# ExecStart=/home/plchuser/app/sequoia/sequoia.pl daemon -m production -l http://*:8080
+# ExecStart=/usr/local/bin/morbo -l http://127.0.0.1:8080 /home/plchuser/app/sequoia/sequoia.pl
 
 [Install]
 WantedBy=multi-user.target
