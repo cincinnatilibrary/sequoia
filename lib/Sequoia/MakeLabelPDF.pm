@@ -768,7 +768,9 @@ sub create_label_PDFs {
                     my $itemid = $request_ref->{'itemid'};
                     my $time   = $request_ref->{'time'};
                     my $pieces = $request_ref->{'pieces'};
-                    $add_label_ref->($pdf, $fonts_ref, $item_info_ref, { 'itemid'=>$itemid , 'user'=>$user , 'date'=>$date , 'time'=>$time, 'piece'=>$_ }) foreach (1..$pieces);
+                    # RV add the requesting location (just hardcode it for now)
+                    my $requesting_location = '';
+                    $add_label_ref->($pdf, $fonts_ref, $item_info_ref, { 'itemid'=>$itemid , 'user'=>$user , 'date'=>$date , 'time'=>$time, 'piece'=>$_, 'requesting_location'=>$requesting_location }) foreach (1..$pieces);
                     $label_count += $pieces;
                 }
                 $pdf->save;
@@ -805,8 +807,12 @@ sub add_disc_label {
 #    draw_disc_stickers($gfx) if $req_ref->{'user'} eq 'XDBADEV';
 
     #Header
+    # RV shorten the time to display (of the record create time)
+    my $shortened_time = substr( ($req_ref->{'time'}), 0, 10);
+    
     $this_items{'disc_pieces'} .= '*' if ($this_items{'book_pieces'} > 0);
-    $gfx->textlabel( 14/pt, 284/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'disc_pieces'}) );
+    # RV added requesting_location
+    $gfx->textlabel( 14/pt, 284/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'requesting_location'}, $req_ref->{'date'}, $shortened_time, $req_ref->{'piece'}.'/'.$this_items{'disc_pieces'}) );
     fit_text($gfx,  14/pt, 272/pt, $font{'bold'},  8/pt, $this_items{'title'}, 150/pt, {'-elipsis' => '...'});
 
     #Ownership Label 1/2
@@ -966,7 +972,9 @@ sub add_book_label {
 
     #Header
     $this_items{'book_pieces'} .= '*' if ($this_items{'disc_pieces'} > 0);
-    $gfx->textlabel( 25/pt, 209/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'book_pieces'}) );
+    my $shortened_time = substr( ($req_ref->{'time'}), 0, 10);
+    # $gfx->textlabel( 25/pt, 209/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, $req_ref->{'date'}, $req_ref->{'time'}, $req_ref->{'piece'}.'/'.$this_items{'book_pieces'}) );
+    $gfx->textlabel( 25/pt, 209/pt, $font{'bold'},  8/pt, join(" $middot ", $this_items{'icode1'}, $req_ref->{'user'}, 'ILS' , $req_ref->{'date'}, $shortened_time, $req_ref->{'piece'}.'/'.$this_items{'book_pieces'}) );
     fit_text($gfx, 25/pt, 197/pt, $font{'bold'},  8/pt, $this_items{'title'}, 190/pt, {'-elipsis' => '...'});
 
     #print the barcode

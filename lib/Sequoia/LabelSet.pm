@@ -12,7 +12,10 @@ BEGIN
 
 
 sub label_set {
-	my ( $dbh , @barcodes ) = @_ ;
+	my ( $dbh , $barcodes_list, $reqestlocations_list ) = @_ ;
+
+	my @barcodes = split( ',' , $barcodes_list );
+	my @reqestlocations = split( ',' , $reqestlocations_list );
 
 	#various timestamps used for various purposes
 	my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
@@ -37,10 +40,19 @@ sub label_set {
 	#
 	#  $label_request_ref->{$date}{$uacs}{$barcode} = $time;
 
-	foreach my $barcode (@barcodes)
-	{
-		#TODO: error checking / input validation
-		$label_requests{$yyyymmdd}{'OnDemand'}{$barcode} = $hhmmss;
+	# previously we looped through just the barcode array, now we need to loop through both this array, and the requestlocations
+	# foreach my $barcode (@barcodes)
+	# {
+	# 	#TODO: error checking / input validation
+	# 	$label_requests{$yyyymmdd}{'OnDemand'}{$barcode} = $hhmmss;
+	# 	print STDERR "barcode: " . $barcode . "\n";
+	# }
+
+	for my $i (0 .. $#barcodes) {
+		# my $first  = $array1[$i];
+		# my $second = $array2[$i];
+		print STDOUT "barcode in request: " . $barcodes[$i] . "  " . $reqestlocations[$i] . "\n";
+		$label_requests{$yyyymmdd}{'OnDemand ' . chr(183) . " " . $reqestlocations[$i]}{$barcodes[$i]} = $hhmmss;
 	}
 
 	# this takes your requests and fills up the %item_info_for hash

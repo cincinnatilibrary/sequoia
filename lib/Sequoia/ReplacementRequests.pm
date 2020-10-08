@@ -22,7 +22,10 @@ sub request_list {
 }
 
 sub add_request_to_request_list {
-	my ( $barcode, $title ) = @_;
+	print STDOUT "IN SUB: add_request_to_request_list\n";
+
+	my ( $barcode, $title, $reqestLocation ) = @_;
+	# my ( $barcode, $title ) = @_;
 
 	# Alter local .json file
 	my $work_dir = './public/';
@@ -43,6 +46,11 @@ sub add_request_to_request_list {
 
 	$replacement_requests->{$barcode}->{'request_timestamp'} = $timestamp ;
 	$replacement_requests->{$barcode}->{'title'} = $title;
+
+	# RV add reqestLocation
+	$replacement_requests->{$barcode}->{'reqestLocation'} = $reqestLocation;
+	print STDERR "replacement_requests -> reqestLocation :";
+	print STDERR $replacement_requests->{$barcode}->{'reqestLocation'} . "\n";
 
 	#write changes to file
 	open $fh, ">", $work_dir.$filename;

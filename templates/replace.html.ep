@@ -10,9 +10,68 @@
 			<legend>Request a replacement label:</legend>
 			<div class="form-group">
 				<input type="text" class="form-control" placeholder="Enter one barcode: ( e.g. A000024164808 )" id="barcodeInput">
+				<div>&nbsp;</div>
 			</div>
-			<button type="submit" class="btn btn-primary">Request</button>
+			
 			</fieldset>
+
+			<fieldset>
+				<legend>Request Location</legend>
+				<div class="form-group">
+					<select class="form-control" id="requestLocation">
+						<option value = "gen">Main Library: Geneaology & Local History (gen)</option>
+						<option value = "irf">Main Library: Information & Reference (irf)</option>
+						<option value = "pop">Main Library: Popular Library (pop)</option>
+						<option value = "clc">Main Library: Youth Services (clc)</option>
+						<option value = "an">Anderson (an)</option>
+						<option value = "av">Avondale (av)</option>
+						<option value = "ba">Blue Ash (ba)</option>
+						<option value = "bh">Bond Hill (bh)</option>
+						<option value = "ch">Cheviot (ch)</option>
+						<option value = "cl">Clifton (cl)</option>
+						<option value = "co">College Hill (co)</option>
+						<option value = "cr">Corryville (cr)</option>
+						<option value = "cv">Covedale (cv)</option>
+						<option value = "dc">Distribution Center (dc)</option>
+						<option value = "dp">Deer Park (dp)</option>
+						<option value = "dt">Delhi Township (dt)</option>
+						<option value = "ep">Elmwood Place (ep)</option>
+						<option value = "fo">Forest Park (fo)</option>
+						<option value = "ge">Green Township (ge)</option>
+						<option value = "gh">Greenhills (gh)</option>
+						<option value = "gr">Groesbeck (gr)</option>
+						<option value = "ha">Harrison (ha)</option>
+						<option value = "hp">Hyde Park (hp)</option>
+						<option value = "ils">ILS Department (ils)</option>
+						<option value = "lv">Loveland (lv)</option>
+						<option value = "ma">Madeira (ma)</option>
+						<option value = "md">Madisonville (md)</option>
+						<option value = "mm">Mariemont (mm)</option>
+						<option value = "mn">Miami Township (mn)</option>
+						<option value = "mo">Monfort Heights (mo)</option>
+						<option value = "mt">Mt Healthy (mt)</option>
+						<option value = "mw">Mt Washington (mw)</option>
+						<option value = "nr">North Central (nr)</option>
+						<option value = "ns">Northside (ns)</option>
+						<option value = "nw">Norwood (nw)</option>
+						<option value = "oa">Oakley (oa)</option>
+						<option value = "os">Outreach Services (os)</option>
+						<option value = "pl">Pleasant Ridge (pl)</option>
+						<option value = "pr">Price Hill (pr)</option>
+						<option value = "re">Reading (re)</option>
+						<option value = "sb">St Bernard (sb)</option>
+						<option value = "sh">Sharonville (sh)</option>
+						<option value = "sm">Symmes Township (sm)</option>
+						<option value = "wh">Walnut Hills (wh)</option>
+						<option value = "wt">West End (wt)</option>
+						<option value = "ww">Westwood (ww)</option>
+						<option value = "wy">Wyoming (wy)</option>
+					</select>
+				</div>
+			</fieldset>
+
+			<button type="submit" class="btn btn-primary">Request</button>
+
 		</form>
 
 		<p></p>

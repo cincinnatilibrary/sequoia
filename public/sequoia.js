@@ -157,7 +157,19 @@ function add_barcodes()
 			}
 
 			//save barcodes into localStorage for later use
+			console.log('setting barcodes to localStorage... in add_barcodes()')
 			localStorage.setItem('barcodes', '[ "' + array_of_good_bc.join('" , "') + '"] '  );
+
+			// RV barcodes should now contain extra info, such as requesting location, and title so that we can use it on the lable:
+			// for some reason, localstorage is where the barcodes are drawn from the submit the request
+			
+			// .. the information stored in:
+			// /replacementrequests.json
+			// e.g.:
+			// {"A000054394499":{"reqestLocation":"bh","request_timestamp":"2020-09-16 10:33:25","title":"Moana"}}
+			
+
+
 			//localStorage.setItem('barcodes', '[ "' + array_of_bc.join('" , "') + '"] '  );
 			//TODO: remove this from localStorage at some point with removeItem
 
@@ -184,6 +196,7 @@ function make_labels()
 	var barcodesstring = localStorage.getItem('barcodes');
 	var parsedbarcodes = JSON.parse( barcodesstring );
 	var commasepbarcodes = '';
+	var commaseprequestlocations = '';
 
 	//build url string for labels webservice
 	//there is probably a better way to do this
@@ -191,9 +204,17 @@ function make_labels()
 	$.each( parsedbarcodes, function(k,v)
 	{
 		commasepbarcodes += v;
+
+		// get the location from the barcode in localstorage:
+		try {
+			commaseprequestlocations += JSON.parse(localStorage.getItem(v)).reqestLocation;
+		}
+		catch (exception) { /* do nothing for now... i guess */}
+
 		if( k < parsedbarcodes.length-1 )
 		{
 			commasepbarcodes += ',';
+			commaseprequestlocations += ',';
 		}
 	});
 
@@ -206,6 +227,11 @@ function make_labels()
 	var myData = {};
 
 	myData.barcodes = commasepbarcodes;
+
+	myData.reqestLocations = commaseprequestlocations;
+
+	console.log('myData:');
+	console.log(myData);
 
 	//request labels be made
 	var promise1 = $.ajax({
@@ -268,6 +294,10 @@ function add_request()
 	//reset display to blank
 	$( '#myList' ).html( my_bc_list );
 	//$( "#makeLabels" ).hide();
+
+	// work with the requestLocation
+	my_reqestLocation = $( '#requestLocation').val();
+	console.log(my_reqestLocation);
 
 	//TODO: refactor this to only take one barcode at a time
 
@@ -337,6 +367,12 @@ function add_request()
 
 		myData.barcode = good_bc;
 		myData.title = good_title;
+
+		// RV added requester
+		myData.reqestLocation = my_reqestLocation
+		console.log('add_request() making ajax request...')
+		console.log(myData)
+
 		//console.log( "bc:"+myData.barcode );
 		//console.log( "title:"+myData.title );
 		$.ajax({
@@ -403,8 +439,12 @@ function show_requests()
 
 			//sort these results
 			var sortable = [];
-			for (var r in resp )
-			{
+			for (var r in resp ) {
+				console.log(r);
+				// set additional values in the localStorage based on barcode, so we can reference them later
+				console.log(JSON.stringify(resp[r]));
+				localStorage.setItem(r, JSON.stringify(resp[r]));
+
 				sortable.push([resp[r].request_timestamp, r, resp[r].title]);
 				barcodes.push(r);
 			}
@@ -428,7 +468,11 @@ function show_requests()
 			//show the result html list
 			//$( "#myRequestList" ).html( rq_list_html );
 
+			console.log('setting barcodes to localStorage in show_requests()')
 			localStorage.setItem('barcodes', '[ "' + barcodes.join('", "') + '"] '  );
+
+			console.log(resp);
+			
 		}
 	});
 

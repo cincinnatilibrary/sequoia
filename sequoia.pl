@@ -30,7 +30,7 @@ app->secrets(['new_passw0rd', 'old_passw0rd', 'very_old_passw0rd']);
 
 # pull config paramaters in from config file instead of using env:
 use Config::Simple;
-my $cfg = new Config::Simple('/home/plchuser/app/sequoia/sequoia.cfg');
+my $cfg = new Config::Simple('/home/plchuser/testing/sequoia/sequoia.cfg');
 
 my $db_host = $cfg->param("db_host");
 my $db_port = $cfg->param("db_port");
@@ -112,20 +112,34 @@ any '/itemsinfo' => sub {
 };
 
 any '/labels' => sub {
+
+	print STDOUT "IN SUB: /labels RV\n";
 	my $self = shift;
 	my $barcodes_list = $self->param('barcodes');
-	my @barcodes = split( ',' , $barcodes_list );
+	my $reqestlocations_list = $self->param('reqestLocations');
 
-	$self->render(json => Sequoia::LabelSet::label_set( $dbh, @barcodes ) );
+	print STDERR "barcodes_list: " . $barcodes_list . "\n";
+
+	print STDERR "reqestlocations_list: " . $reqestlocations_list . "\n";
+	# select()->flush();
+
+	# sending the array references now instead 
+	$self->render(json => Sequoia::LabelSet::label_set( $dbh, $barcodes_list, $reqestlocations_list ) );
 };
 
 any 'addreplacementrequest' => sub {
 	my $self = shift;
 	my $barcode = $self->param('barcode');
 	my $title = $self->param('title');
+	
+	# RV added reqestLocation
+	my $reqestLocation = $self->param('reqestLocation');
+
+	app->log->debug( "reqestLocation: " );
+	app->log->debug( $reqestLocation . '\n');
 
 	# stash the barcodes to somewhere
-	Sequoia::ReplacementRequests::add_request_to_request_list( $barcode, $title );
+	Sequoia::ReplacementRequests::add_request_to_request_list( $barcode, $title, $reqestLocation );
 
 	# return the current ( now updated ) list of requests in JSON
 	$self->render( json => Sequoia::ReplacementRequests::request_list() );
