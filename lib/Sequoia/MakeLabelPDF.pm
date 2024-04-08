@@ -982,11 +982,26 @@ sub add_book_label {
     );
     $gfx->formimage($bc, 35/pt, 135/pt, 0.7);
 
+    # Add 'chpl.org' text above the barcode, attempting centering manually
+    my $text = 'CHPL.org';
+    my $font_size = 8; # Smaller font size
+
+    # Calculate the starting X-coordinate for the text to approximately center it over the barcode
+    # Without knowing the exact width of "CHPL.org", we approximate by adjusting this manually
+    # my $text_start_x = $barcode_center_x - ($barcode_scaled_width / 4); # Adjust this value as needed
+    my $text_start_x = 35/pt + 72/pt;  # 70/pt half the width of the barcode?
+    my $text_y_position = 178/pt; # Adjust y-coordinate as needed for positioning above the barcode
+
+    # $gfx->textlabel($text_x_position, $text_y_position, $font{'normal'}, $font_size, $text, '-align' => 'center');
+    $gfx->textlabel($text_start_x, $text_y_position, $font{'normal'}, $font_size, $text, '-align' => 'center');
+
     #Ownership Label
-    $gfx->textlabel( 258/pt, 180/pt, $font{'helvetica'},  7/pt, 'The Public Library',   '-align' => 'center' );
-    $gfx->textlabel( 258/pt, 172/pt, $font{'helvetica'},  7/pt, 'of Cincinnati and', '-align' => 'center' );
-    $gfx->textlabel( 258/pt, 164/pt, $font{'helvetica'},  7/pt,  'Hamilton County', '-align' => 'center' );
-    $gfx->textlabel( 258/pt, 139/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );
+    $gfx->textlabel( 258/pt, 180/pt, $font{'helvetica'},  7/pt, 'Cincinnati &',   '-align' => 'center' );
+    $gfx->textlabel( 258/pt, 172/pt, $font{'helvetica'},  7/pt, 'Hamilton County', '-align' => 'center' );
+    $gfx->textlabel( 258/pt, 164/pt, $font{'helvetica'},  7/pt, 'Public Library', '-align' => 'center' );
+    $gfx->textlabel( 258/pt, 156/pt, $font{'helvetica'},  7/pt, 'CHPL.org', '-align' => 'center' );
+    # $gfx->textlabel( 258/pt, 139/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );
+    $gfx->textlabel( 258/pt, 135/pt, $font{'helveticabold'}, 24/pt, $this_items{'agency'}, '-align' => 'center' );
     if ( says_floating('libr'=>$this_items{'libr'}, 'ityp'=>$this_items{'ityp'}, 'ict1'=>$this_items{'ict1'}, 'locn'=>$this_items{'locn'}) ) {
         $gfx->textlabel( 258/pt, 120/pt, $font{'helveticabold'}, 14/pt, 'Floating', '-align' => 'center' );
     }
