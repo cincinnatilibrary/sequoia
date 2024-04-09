@@ -39,7 +39,9 @@ my $db_pass = $cfg->param("db_pass");
 
 my $dbh = DBI->connect("DBI:Pg:dbname=iii;host=".$db_host.";port=".$db_port."",$db_user,$db_pass,{'RaiseError'=>0,'pg_enable_utf8'=>1});
 
-my $archive_password = $ENV{'ARCHIVE_PASSWORD'};
+# my $archive_password = $ENV{'ARCHIVE_PASSWORD'};
+my $archive_password = $cfg->param("archive_password");
+
 
 # this is needed in order to tell hypnotoad what port to listen on:
 app->config(hypnotoad => {
