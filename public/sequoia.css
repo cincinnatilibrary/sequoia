@@ -1,0 +1,7 @@
+body {
+    padding-bottom: 75px;
+}
+
+textarea.inputBadShadow {
+    box-shadow: 0 0 10px 5px #990000;
+}

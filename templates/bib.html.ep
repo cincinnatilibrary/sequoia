@@ -1,0 +1,27 @@
+% layout 'default';
+
+<div id="bibTitle" >
+  <form id="bibSearch" action="javascript:find_barcodes();" >
+    <fieldset>
+      <legend>Enter one bib record number: ( e.g. b10411914 ):</legend>
+      <input id="bibNumInput" type="text" />
+      ( icode1: <input id="icode1NumInput" type="text" value="all" size="3" /> )
+      <button class="btn btn-primary" type="submit">Find Items</button>
+    </fieldset>
+  </form>
+
+  <p></p>
+  <div id="bibItems" >
+    <ul id="myBarcodeList">
+    </ul>
+  </div>
+
+  <form id="makeLabels" action="javascript:make_labels();" style="display: none">
+    <button class="btn btn-success" id="makeButton" type="submit">Make PDF</button>
+  </form>
+</div>
+
+<div id="myPdf">
+  <ul id="myPdfList">
+  </ul>
+</div>

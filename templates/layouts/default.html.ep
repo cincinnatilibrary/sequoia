@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sequoia</title>
+  <link href="./favicon.ico" rel="shortcut icon">
+  <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./sequoia.css">
+  <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="./sequoia.js"></script>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Sequoia</h1>
+
+    <div class="navbar navbar-default" role="navigation">
+      <div class="navbar-inner">
+        <div class="container" >
+          <ul class="nav navbar-nav">
+            <li <% if ( current_route eq '' ){ %> class="active" <% } %> ><a href="./">Home</a></li>
+            <li <% if ( current_route eq 'bibhtml' ){ %> class="active" <% } %> ><a href="./bib.html">by Bib Number</a></li>
+            <li <% if ( current_route eq 'barcodeshtml' ){ %> class="active" <% } %> ><a href="./barcodes.html">by Barcode</a></li>
+            <li <% if ( current_route eq 'replacehtml' ){ %> class="active" <% } %> ><a href="./replace.html">Replacement</a></li>
+            <li <% if ( current_route eq 'historyhtml' ){ %> class="active" <% } %> ><a href="./history.html">History</a></li>
+            <li <% if ( current_route eq 'helphtml' ){ %> class="active" <% } %> ><a href="./help.html">Help</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <%= content %>
+
+    <footer class="navbar-default navbar-fixed-bottom">
+      <div class="container">
+        <p class="text-muted">DB Host is: <%= $db_host %></p>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

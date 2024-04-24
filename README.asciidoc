@@ -1,0 +1,84 @@
+= Sequoia
+Dave Menninger
+Ray Voelker
+
+== Overview
+
+Sequoia is an on-demand label creation app for Sierra ILS from Innovative Interfaces.  It provides a web interface through which a user can request a label or group of labels and it delivers a PDF.
+
+== History
+
+This code started out working with a different ILS, running on a different platform, and wrapped in various different wrappers over time.  The meat of the code in MakeLabelPDF.pm that does most of the heavy lifting is at least a decade old and has been contributed to by 2-3 authors.
+
+The label sizes, types, fonts, layout, etc, are all hard-coded in for our local purposes.  Re-writing those parts of the code to be more configurable would be nice.
+
+== How to run this app in a production env
+
+This app can be run in a Docker env (as explained below) but may more easily be run in a more traditional way
+
+* move to the desination directory where you want to run the app
+* `git clone https://github.com/plch/sequoia.git`
+* `cd sequoia`
+* create the config file (`sequoia.cfg`) that will define the database it's pointed to. It will look similar to this:
+```
+db_host: sierra-db.cincinnatilibrary.org
+db_port: 1032
+db_user: DB_USERNAME_HERE
+db_pass: DB_PASSWORD_HERE
+```
+* check the path for the config in the file `sequoia.pl`. It may look something like this:
+`my $cfg = new Config::Simple('/home/plchuser/app/sequoia/sequoia.cfg');`
+* setup the apache2 server to act as a reverse proxy for the app. More details can be found in the `apache2_config` directory
+* set the app to run at startup via systemd. More details can be found in the `systemd_scripts` directory. Note, that you must also set the correct path for the target app in the script.
+
+
+== How to run this app in Docker
+
+This app is designed to be run in Docker, but it doesn't have to be.  It relies on some environment variables that can either be set in the Dockerfile or using the run command.
+
+* `git clone <this app>`
+* `cd sequoia`
+* `sudo docker.io build -t sequoia-image .`
+* `sudo docker.io run -d --name=sequoia-container -e "DB_HOST=db.example.com" -e "DB_PORT=0" -e "DB_USER=sqlusername" -e "DB_PASS=secret" sequoia-image`
+
+I also need to use `--dns="<local-dns-server>"` in my `run` command for my particular environment.
+
+== Pages
+
+* index.html
+* bib.html
+* barcodes.html
+* help.html
+* history.html
+
+== "API methods"
+
+* /bibitems - information about a single bib, by bibnumber
+* /itemsinfo - information about a set of items, by item barcode
+* /labels - produces a PDF file, returns info about file
+
+== TODO
+
+* layout
+* page for deleting old .pdf files
+* performance testing - hypnotoad or starman
+
+== Credits
+
+* Public Library of Hamilton County
+** Dave Menninger
+** Rob Ireton
+* PDF::API2
+* DejaVu LGC fonts
+* docker.io, octohost/mojolicious
+* jquery, bootstrap, bower
+
+
+== Notes
+
+run:
+```bash
+cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+```
+
+in order to set the local user directory as the perm module install / source

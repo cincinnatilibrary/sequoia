@@ -1,0 +1,59 @@
+%layout 'default';
+
+<div class="container">
+
+	<div id="bibTitle" >
+
+
+		<form class="form" id="barcodeInputForm" action="javascript:add_request();">
+			<fieldset>
+			<legend>Request a replacement label:</legend>
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Enter one barcode: ( e.g. A000024164808 )" id="barcodeInput">
+			</div>
+			<button type="submit" class="btn btn-primary">Request</button>
+			</fieldset>
+		</form>
+
+		<p></p>
+
+		<ul id="myBarcodeList">
+		</ul>
+
+		<h3>Current Requests:</h3>
+
+		<form class="form" id="makeLabels" >
+			<table class="table table-striped" id="myRequestTable">
+				<tbody>
+					<tr>
+						<th>Requested Date</th>
+						<th>Barcode</th>
+						<th>Title</th>
+						<th>Archive (<input id="select-all-checkbox" type="checkbox">Select All</input>)</th>
+					</tr>
+				</tbody>
+			</table>
+
+			<button class="btn btn-success" id="makeButton" type="submit" formaction="javascript:make_labels();" >Make PDF of these Requests</button>
+			<button class="btn btn-danger pull-right" id="ArchiveButton" type="submot" formaction="javascript:archive_requests();" >Archive Selected Requests</button>
+			<br/><input id="archivePassword" class="pull-right" type="text" value="password"></input>
+		</form>
+
+		<div id="myPdf">
+			<ul id="myPdfList">
+			</ul>
+		</div>
+
+		<h3>Archived Requests:</h3>
+
+		<table class="table table-striped" id="myArchiveTable">
+			<tbody>
+				<tr><th>Archived Date</th><th>Requested Date</th><th>Barcode</th><th>Title</th></tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+   show_requests();
+</script>

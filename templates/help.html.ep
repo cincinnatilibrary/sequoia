@@ -1,0 +1,46 @@
+% layout 'default';
+
+<h1>Help</h1>
+
+<br/>
+
+<h4>By Bib Number</h4>
+<p>
+  <ul>
+    <li>The bib number input should be able to take numbers with a 'b' and without a 'b' as well as with a check digit or without.</li>
+    <li>If a number is entered in the <b>icode1</b> box, it will only return items that have that icode1 value.  If anything other than a number is in this box, it will return all items for the given bib.</li>
+    <li>This page will warn the user if the returned set of items contain duplicate barcodes.</li>
+  </ul>
+</p>
+
+<br/>
+
+<h4>By Barcodes</h4>
+<p>
+  <ul>
+    <li>The barcode input will accept a list barcodes separated with commas or whitespace.  Upper or lower case is accepted.</li>
+    <li>When you click <b>Process Input</b> it shows which barcodes are existing items and which are not.</li>
+    <li>The input box turns red if there is a problem with the input.   Problems include: bad characters, too many barcodes.
+  </ul>
+</p>
+
+<br/>
+
+<h4>Adding a Replacement Request</h4>
+<p>
+	<ul>
+		<li>Enter one barcode at a time</li>
+		<li>If the barcode is in the list already, the old instance will be replaced by the new instance.</li>
+	</ul>
+</p>
+
+<br/>
+
+<h4>Troubleshooting</h4>
+<p>
+  This site may not work right if:
+  <ul>
+    <li>you are using IE8</li>
+    <li>you are using IE in Compatibility Mode</li>
+  </ul>
+</p>
