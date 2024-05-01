@@ -28,7 +28,7 @@ my %spine_gets_copy   = map { $_ => 1 } qw( CD-BOOK CD-MUSIC CASS-BOOK CASS-MUSI
 #%spine_gets_copy  = map { $_ => 1 } qw( i j 5 7 p );
 
 #substr ( location_code, 0 , 2 ):
-my %is_main_prefix 		= map { $_ => 1 } qw( 1c 1l 1h 1p 1f 2m 2n 3n 2r 2s 2g 2e 3d 3r 3a 3h 3l 4d 2t 2k 2x 3g 3e 3c 4c 4v 5a 5c 5o 5v 5d 5f 5s 5h 5i 5p 5m 5y 5n 5t );
+my %is_main_prefix 		= map { $_ => 1 } qw( 1c 1l 1h 1p 1f 2m 2n 3n 2c 2p 2r 2s 2g 2e 3d 3r 3a 3h 3l 4d 2t 2k 2x 3c 3g 3e 4c 4v 5a 5c 5o 5v 5d 5f 5s 5h 5i 5p 5m 5y 5n 5t );
 my %is_branch_prefix 	= map { $_ => 1 } qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy os ts);
 
 #translate Sierra bcode2 into a Symphony ict1
@@ -152,7 +152,7 @@ my %ityp_is_floating  = map {$_=>1} qw( 1 3 5 21 23 158 160 );  #SIERRA: ityp co
 my %ityp_can_float    = map {$_=>1} qw( BOOK 0 2 4 20 22 60 61 70 71 72 77 78 90 91 92 101 157 159 );  #SIERRA: itype code numbers.
 my %libr_is_branch    = map {$_=>1} qw( an av ba bh ch cl co cr cv dp dt ep fo ge gh gr ha hp lv ma mm md mn mo mt mw nw nr ns oa pl pr re sh sb sm wh wt ww wy ts);  #take the branch prefix from location_code
 
-sub locn_floats{
+sub locn_floats {
 	my $locn = shift;
 	my $location_code_4		= ( length $locn > 3 ) ? substr( $locn, 3, 1 ) : "";
 	my $location_code_5		= ( length $locn > 4 ) ? substr( $locn, 4, 1 ) : "";
@@ -231,132 +231,178 @@ sub get_info_for_requested_items {
         }
     }
 
-	my $sql_query = "SELECT ";
+    # Prepare the placeholder string based on the number of items in @itemids
+    my $placeholders = join(",", ('?') x @itemids);
 
-	$sql_query .= "item_view.record_num, ";
-	$sql_query .= "item_view.id, ";
-	$sql_query .= "item_view.barcode, ";
-	$sql_query .= "item_view.copy_num, ";
-	$sql_query .= "item_view.icode1, ";
-	$sql_query .= "item_view.location_code, ";
-	$sql_query .= "item_view.itype_code_num, ";
-	$sql_query .= "item_view.agency_code_num, ";
+    # write the sql as a here-doc string -- NOTE: end with an un-indented `ENDSQL`
+    my $sql_query = <<"ENDSQL";
+SELECT 
+	item_view.record_num, 
+	item_view.id, 
+	item_view.barcode, 
+	item_view.copy_num, 
+	item_view.icode1, 
+	item_view.location_code, 
+	item_view.itype_code_num, 
+	item_view.agency_code_num, 
+	bib_record_item_record_link.id, 
+	bib_view.title, 
+	bib_view.bcode2, 
+	record_metadata.record_last_updated_gmt, 
+	( 
+		-- callnum from the item record ( rather than from the bib )
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM 
+			sierra_view.varfield_view 
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.item_view.record_num
+		 	and sierra_view.varfield_view.record_type_code = 'i'
+		 	and sierra_view.varfield_view.varfield_type_code = 'c' 
+		LIMIT 1 
+	) as item_callnum, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM 
+			sierra_view.varfield_view 
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+		 	and sierra_view.varfield_view.record_type_code = 'b'
+		 	and sierra_view.varfield_view.varfield_type_code = 'c' 
+		LIMIT 1 
+	) as callnum, 
+	( 
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM 
+			sierra_view.varfield_view 
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+		 	and sierra_view.varfield_view.record_type_code = 'b'
+		 	and sierra_view.varfield_view.varfield_type_code = 'a' 
+		LIMIT 1 
+	) as author, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM
+			sierra_view.varfield_view 
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+			and sierra_view.varfield_view.record_type_code = 'b' 
+		 	and sierra_view.varfield_view.marc_tag = '086'
+		LIMIT 1 
+	) as marc086, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content
+		FROM 
+			sierra_view.varfield_view
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num 
+		 	and sierra_view.varfield_view.record_type_code = 'b'
+		 	and sierra_view.varfield_view.marc_tag = '092'
+		LIMIT 1 
+	) as marc092, 
+	( 
+		SELECT
+			sierra_view.varfield_view.field_content
+		FROM
+			sierra_view.varfield_view 
+		WHERE
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num 
+			and sierra_view.varfield_view.record_type_code = 'b'
+			and sierra_view.varfield_view.marc_tag = '100'
+		LIMIT 1 
+	) as marc100, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content
+		FROM 
+			sierra_view.varfield_view 
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+		 	and sierra_view.varfield_view.record_type_code = 'b'
+		 	and sierra_view.varfield_view.marc_tag = '245'
+		LIMIT 1 
+	) as marc245, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM 
+			sierra_view.varfield_view 
+		WHERE
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+			and sierra_view.varfield_view.record_type_code = 'b'
+			and sierra_view.varfield_view.marc_tag = '300'
+		LIMIT 1 
+	) as marc300, 
+	(
+		SELECT 
+			sierra_view.varfield_view.field_content 
+		FROM
+			sierra_view.varfield_view
+		WHERE 
+			sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num
+			and sierra_view.varfield_view.record_type_code = 'b' 
+		 	and sierra_view.varfield_view.marc_tag = '955'
+		LIMIT 1 
+	) as marc955, 
+	(
+		SELECT
+			sierra_view.varfield_view.field_content 
+		FROM
+			sierra_view.varfield_view, 
+			sierra_view.volume_view, 
+			sierra_view.volume_record_item_record_link
+		WHERE
+			sierra_view.varfield_view.record_id = sierra_view.volume_view.id
+			and sierra_view.volume_view.id = sierra_view.volume_record_item_record_link.volume_record_id
+			and sierra_view.volume_record_item_record_link.item_record_id = sierra_view.item_view.id
+			and sierra_view.varfield_view.record_type_code = 'j'
+			and sierra_view.varfield_view.varfield_type_code = 'v'
+		ORDER BY 
+			field_content DESC 
+		LIMIT 1 
+	) as volume_statement 
+FROM 
+	sierra_view.item_view
+	JOIN sierra_view.bib_record_item_record_link ON
+		sierra_view.item_view.id = sierra_view.bib_record_item_record_link.item_record_id 
+	JOIN sierra_view.bib_view ON 
+		sierra_view.bib_record_item_record_link.bib_record_id = sierra_view.bib_view.id 
+	JOIN sierra_view.record_metadata ON (
+		sierra_view.record_metadata.id = sierra_view.item_view.id
+ 		and sierra_view.record_metadata.record_type_code = 'i'
+ 	)
+WHERE
+    sierra_view.item_view.barcode IN ($placeholders)
+;
+ENDSQL
 
-	$sql_query .= "sierra_view.bib_record_item_record_link.id, ";
-	$sql_query .= "sierra_view.bib_view.title, ";
-	$sql_query .= "sierra_view.bib_view.bcode2, ";
+    # print STDERR "sql_query: \n$sql_query\n";
 
-	$sql_query .= "sierra_view.record_metadata.record_last_updated_gmt, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.item_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'i' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.varfield_type_code = 'c' ";
-	$sql_query .= "LIMIT 1 ) as item_callnum, ";		#callnum from the item record ( rather than from the bib )
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.varfield_type_code = 'c' ";
-	$sql_query .= "LIMIT 1 ) as callnum, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.varfield_type_code = 'a' ";
-	$sql_query .= "LIMIT 1 ) as author, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '086' ";
-	$sql_query .= "LIMIT 1 ) as marc086, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '092' ";
-	$sql_query .= "LIMIT 1 ) as marc092, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '100' ";
-	$sql_query .= "LIMIT 1 ) as marc100, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '245' ";
-	$sql_query .= "LIMIT 1 ) as marc245, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '300' ";
-	$sql_query .= "LIMIT 1 ) as marc300, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_num = sierra_view.bib_view.record_num AND ";
-	$sql_query .= "		 sierra_view.varfield_view.record_type_code = 'b' AND ";
-	$sql_query .= "		 sierra_view.varfield_view.marc_tag = '955' ";
-	$sql_query .= "LIMIT 1 ) as marc955, ";
-
-	$sql_query .= "( SELECT sierra_view.varfield_view.field_content ";
-	$sql_query .= "FROM sierra_view.varfield_view, sierra_view.volume_view, sierra_view.volume_record_item_record_link ";
-	$sql_query .= "WHERE sierra_view.varfield_view.record_id = sierra_view.volume_view.id ";
-	$sql_query .= "AND sierra_view.volume_view.id = sierra_view.volume_record_item_record_link.volume_record_id ";
-	$sql_query .= "AND sierra_view.volume_record_item_record_link.item_record_id = sierra_view.item_view.id ";
-	$sql_query .= "AND sierra_view.varfield_view.record_type_code = 'j' ";
-	$sql_query .= "AND sierra_view.varfield_view.varfield_type_code = 'v' ";
-	$sql_query .= "ORDER BY field_content DESC ";
-	$sql_query .= "LIMIT 1 ) as volume_statement ";
-
-	$sql_query .= "FROM sierra_view.item_view ";
-
-	#join the bib
-	$sql_query .= "JOIN sierra_view.bib_record_item_record_link ";
-	$sql_query .= "ON sierra_view.item_view.id = sierra_view.bib_record_item_record_link.item_record_id ";
-	$sql_query .= "JOIN sierra_view.bib_view ";
-	$sql_query .= "ON sierra_view.bib_record_item_record_link.bib_record_id = sierra_view.bib_view.id ";
-
-	#join the item record metadata
-	$sql_query .= "JOIN sierra_view.record_metadata ";
-	$sql_query .= "  ON sierra_view.record_metadata.id = sierra_view.item_view.id ";
-	$sql_query .= " AND sierra_view.record_metadata.record_type_code = 'i' ";
-
-	$sql_query .= "WHERE sierra_view.item_view.barcode IN ( " . join( " , ", ('?')x@itemids ) . " ) ";
-
-	$sql_query .= ";";
-
-	#start timing the SQL query
-	my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
-	my $hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
-	#print "query start at ".$hhmmss."...\n";
+	# #start timing the SQL query
+	# my ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
+	# my $hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
+	# #print "query start at ".$hhmmss."...\n";
 
 	my $sth = $dbh->prepare($sql_query);
 
 	$sth->execute( @itemids );
 
-	#end timing the SQL query
-	( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
-	$hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
-	#print "query finish at ".$hhmmss."...\n";
+	# #end timing the SQL query
+	# ( $sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst ) = localtime(time);
+	# $hhmmss = sprintf "%.2d:%.2d:%.2d", $hour, $min, $sec;
+	# #print "query finish at ".$hhmmss."...\n";
 
 	my $items_info_found = 0;
 
-	while( my $item_info = $sth->fetchrow_hashref() )
-	{
+	while( my $item_info = $sth->fetchrow_hashref() ) {
 		$items_info_found +=1;
+
+        # print STDERR "items_info_found: $items_info_found\n";
 
 		#libr - used to decide floating by the says_floating function
 		my $libr = $item_info->{'agency_code_num'};
@@ -369,72 +415,67 @@ sub get_info_for_requested_items {
 		# must be: ADULT,TEEN,JUVENILE
 		# location_code contains a,t,j in the 3rd char if the first two chars are a two-letter prefix
 		my $agency = $item_info->{'location_code'};
+
+        # print STDERR "Initial agency set to: $agency\n";
+
 		my $ict2 = "ADULT";
 		my $location_code_1_2 	= substr( $item_info->{'location_code'}, 0, 2 );
 		my $location_code_3 	= ( length $item_info->{'location_code'} > 2 ) ? substr( $item_info->{'location_code'}, 2, 1 ) : "";
 		my $location_code_4		= ( length $item_info->{'location_code'} > 3 ) ? substr( $item_info->{'location_code'}, 3, 1 ) : "";
 		my $location_code_5		= ( length $item_info->{'location_code'} > 4 ) ? substr( $item_info->{'location_code'}, 4, 1 ) : "";
-		if ( $is_main_prefix{$location_code_1_2} || $is_branch_prefix{$location_code_1_2} )
-		{
+		
+        
+        if ( $is_main_prefix{$location_code_1_2} || $is_branch_prefix{$location_code_1_2} ) {
 			#get ict2 from 3rd char
-			if ( $location_code_3 eq 'a' )
-			{
+			if ( $location_code_3 eq 'a' ) {
 				$ict2 = 'ADULT';
 			}
-			elsif ( $location_code_3 eq 't' )
-			{
+			elsif ( $location_code_3 eq 't' ) {
 				$ict2 = 'TEEN';
 			}
-			elsif ( $location_code_3 eq 'j' )
-			{
+			elsif ( $location_code_3 eq 'j' ) {
 				$ict2 = 'JUVENILE';
 			}
-			else
-			{
+			else {
 				#something's not right
 				$ict2 = 'ADULT';
 			}
 
 			#get agency from first two chars
-			if ( $is_branch_prefix{$location_code_1_2} )
-			{
+			if ( $is_branch_prefix{$location_code_1_2} ) {
 				#branches are two-letter codes
-                if ($location_code_1_2 eq 'ts')
-                {
-                    $agency = 'BR'
+                if ($location_code_1_2 eq 'ts') {
+                    $agency = 'BR';
                 }
-                else 
-                {
+                else {
                     $agency = uc ( $location_code_1_2 );
                 }
 				
 			}
-			else
-			{
+			else {
 				#look up what agency in the lookup table
 				$agency = $agency_for_two_letter_prefix{$location_code_1_2};
 
-				if (  $item_info->{'location_code'} eq '5fac' )
-				{
+				if (  $item_info->{'location_code'} eq '5fac' ) {
 					$agency = 'FAC';
 				}
-				if (  $item_info->{'location_code'} eq '5fis' )
-				{
+
+				if (  $item_info->{'location_code'} eq '5fis' ) {
 					$agency = 'FIN';
 				}
-				if (  $item_info->{'location_code'} eq '5cat' )
-				{
+
+				if (  $item_info->{'location_code'} eq '5cat' ) {
 					$agency = 'CAT';
 				}
-				if (  $item_info->{'location_code'} eq '5cld' )
-				{
+
+				if (  $item_info->{'location_code'} eq '5cld' ) {
 					$agency = 'CLD';
 				}
 			}
 		}
 
-        #RV DEBUG
-        #print STDERR "agency: $agency\n";
+        # RV DEBUG
+        # print STDERR "`sub get_info_for_requested_items: agency: $agency\n";
 
 		#itype code num -> ityp  ??
 		my $ityp = $item_info->{'itype_code_num'};
@@ -469,12 +510,13 @@ sub get_info_for_requested_items {
 
 		#author
 		my $author = defined $item_info->{'author'} ? $item_info->{'author'} : "";
-		#first remove linkage subfield
-		if ( substr( $author, 0, 2 ) eq '|6' )
-		{
+		
+        #first remove linkage subfield
+		if ( substr( $author, 0, 2 ) eq '|6' ) {
 			my $begin = index ( $author, '|', 2 );  #find the next subfield after the first one, which was the |6
 			$author = substr( $author, $begin, ( length($author) - $begin ) );  #cut off the whole first subfield and take the rest
 		}
+
         $author =~ s/\|a//i;
         $author = substr($author, 0, index($author, ',')) if index($author, ',') > -1;
 		$author =~ s/\.$//i;
@@ -485,8 +527,9 @@ sub get_info_for_requested_items {
 
 		#classification
 		my $callclass = "";
-		if ( $item_info->{'bcode2'} eq 'b' )  #TODO: remove the contidional involving the 086
-		{
+		if ( $item_info->{'bcode2'} eq 'b' ) {  
+            #TODO: remove the contidional involving the 086
+		
 			#the only time classification matters to the labels program is for SUDOC
 			$callclass = 'SUDOC';
 			$callnum = $item_info->{'marc086'};
@@ -495,8 +538,7 @@ sub get_info_for_requested_items {
 		#take callnum from item instead of bib.  overrides preceeding lines of code.
 		#$callnum = ( defined $item_info->{'item_callnum'} ) ? $item_info->{'item_callnum'} : $callnum;
 
-		if ( defined $item_info->{'volume_statement'} )
-		{
+		if ( defined $item_info->{'volume_statement'} ) {
 			#append volume statement to the call number
 			if ( $callclass eq 'SUDOC' )
 			{
@@ -514,8 +556,7 @@ sub get_info_for_requested_items {
 		if 	( 	( $ict2 eq 'JUVENILE' ) and
 				( $callnum !~ /Easy/i or $callnum =~ /^PL-Spoken/i ) and
 				( $ityp ne '100' and $ityp ne '101' )
-			)
-		{
+			) {
 			$callnum = "j$callnum";
 		}
 
@@ -529,10 +570,10 @@ sub get_info_for_requested_items {
         my $disc_pieces = 0;
 
         my $marc300 = "";
-        if ( defined $item_info->{'marc300'} )
-        {
+        if ( defined $item_info->{'marc300'} ) {
 			$marc300 = $item_info->{'marc300'};
 		}
+
         $marc300 =~ s/\|a//i;
         $marc300 =~ s/\|b/ /i;
         $marc300 =~ s/\|c/ /i;
@@ -572,11 +613,9 @@ sub get_info_for_requested_items {
         }
 
         my $marc955_pieces = 1;
-        if ( defined $item_info->{'marc955'} )
-	{
+        if ( defined $item_info->{'marc955'} ) {
             $item_info->{'marc955'} =~ s/\|a//i;
-            if ($item_info->{'marc955'} =~ /([0-9]+)/ )
-            {
+            if ($item_info->{'marc955'} =~ /([0-9]+)/ ) {
                 $marc955_pieces = $1;
             }
         }
